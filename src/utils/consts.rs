@@ -1,0 +1,27 @@
+pub const MAX_THREADS_NO: usize = 32768;
+pub const BUDDY_ALLOCATOR_ORDER: usize = 16;
+
+pub const PAGE_SIZE: usize = 4096;
+
+// TODO manage address spaces
+pub const METADATA_ADDRESS_START: usize = 0x00007FFF_FF000000;
+pub const METADATA_HEAP_SIZE: usize = 16 * PAGE_SIZE;
+
+/*
+2 ^ 15
+
+0x00007FFF_FF000000
+
+0x7FFFF____
+
+32768 -> 0x8000
+
+FFFF8000_00000000
+FFFFFFFF_FFF00000
+
+FFFF_FFFF_FFF0_FFFF
+
+
+
+
+ */
