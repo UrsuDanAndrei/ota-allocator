@@ -1,4 +1,5 @@
-pub const MAX_THREADS_NO: usize = 32768;
+pub const MAX_THREADS_NO: usize = 3;
+// pub const MAX_THREADS_NO: usize = 32768;
 // pub const BUDDY_ALLOCATOR_ORDER: usize = 16;
 
 pub const PAGE_SIZE: usize = 4096;

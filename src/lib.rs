@@ -18,20 +18,21 @@ pub struct OtaAllocator {
 }
 
 impl OtaAllocator {
-    pub fn new() -> Self {
+    pub const fn new() -> Self {
         // this is needed because arr! doesn't accept MAX_THREADS_NO
-        if consts::MAX_THREADS_NO != 32768 {
-            panic!();
-        }
+        // if consts::MAX_THREADS_NO != 32768 {
+        //     panic!();
+        // }
 
         let mut tid = 0;
         OtaAllocator {
-            tid2meta: arr_macro::arr![ThreadMeta::new({ tid += 1; tid - 1 }); 32768],
+            tid2meta: arr_macro::arr![ThreadMeta::new({ tid += 1; tid - 1 }); 3],
             meta_alloc: LockedHeap::new(),
         }
     }
 
     // this function must be call EXACTLY once before using the allocator
+    // TODO maybe make this function with &self instead of &mut self
     pub fn init(&mut self) {
         unsafe {
             if let Err(err) = mman_wrapper::mmap(consts::META_ADDR_START as *mut u8,
