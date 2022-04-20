@@ -15,11 +15,11 @@ pub fn get_tid_for_addr(addr: usize) -> usize {
 #[inline(always)]
 pub fn get_current_tid() -> usize {
     unsafe {
-        libc::gettid() as usize
+        libc::pthread_self() as usize
     }
 }
 
 #[inline(always)]
 pub fn is_meta_addr(addr: *mut u8) -> bool {
-    addr as usize & consts::META_CHECK_MASK == consts::META_ADDR_START
+    addr as usize & consts::ADDR_SPACE_MASK == consts::META_ADDR_SPACE
 }

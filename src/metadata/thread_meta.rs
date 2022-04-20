@@ -13,32 +13,41 @@ pub struct ThreadMeta {
 
     last_addr: RefCell<usize>,
 
-    // we need option here because HashMap::new can't be called from a constant function
+    // TODO make your own wrapper or find a better one instead of using Option
+    //  we need option here because HashMap::new can't be called from a constant function
     pub(crate) addr2meta: Mutex<Option<HashMap<*mut u8, AddrMeta>>>,
 }
 
 impl ThreadMeta {
-    pub const fn new(tid: usize) -> Self {
+    pub const fn new(last_addr: usize) -> Self {
         ThreadMeta {
             use_meta_alloc: RefCell::new(false),
             addr2meta: Mutex::new(None),
-            last_addr: RefCell::new(utils::get_last_addr_for_tid(tid)),
+            last_addr: RefCell::new(last_addr),
         }
     }
 
     pub fn next_addr(&self, layout: Layout) -> *mut u8 {
+
+        eprintln!("FFFFFFFFFFFFFFFFFF 1");
         let mut last_addr = self.last_addr.borrow_mut();
+        eprintln!("FFFFFFFFFFFFFFFFFF 2");
 
         let next_addr = match last_addr.checked_sub(layout.size()) {
             None => return ptr::null_mut(),
             Some(next_addr) => utils::align_down(next_addr, cmp::max(layout.align(), 4096)),
         } as *mut u8;
 
+        eprintln!("FFFFFFFFFFFFFFFFFF 3, {:?}, {}", next_addr, layout.size());
+
         if let Err(err) = unsafe { mman_wrapper::mmap(next_addr, layout.size()) } {
             // TODO maybe handle mmap errors
+            eprintln!("Error with code: {}, when calling mmap!", err);
             panic!("Error with code: {}, when calling mmap!", err);
             // return ptr::null_mut();
         }
+
+        eprintln!("FFFFFFFFFFFFFFFFFF 4");
 
         *last_addr = next_addr as usize;
 

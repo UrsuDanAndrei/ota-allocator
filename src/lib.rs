@@ -1,4 +1,4 @@
-#![no_std]
+// #![no_std]
 
 mod metadata;
 mod mman_wrapper;
@@ -6,43 +6,52 @@ mod utils;
 
 use buddy_system_allocator::LockedHeap;
 use core::alloc::{GlobalAlloc, Layout};
+use core::cell::RefCell;
 use hashbrown::HashMap;
-use metadata::{AddrMeta, ThreadMeta};
+use metadata::{Metadata, AddrMeta, ThreadMeta};
+use spin::RwLock;
 use utils::consts;
+use core::mem;
+use core::sync::atomic::AtomicUsize;
+use std::sync::atomic::Ordering;
 
 pub struct OtaAllocator {
-    tid2meta: [ThreadMeta; consts::MAX_THREADS_NO],
+    using_meta_allocator: AtomicUsize,
+    meta: RwLock<Metadata>,
+
     // FIXME, figure out the proper ORDER value here, using 16 for now
     //  also figure out why using consts::BUDDY_ALLOCATOR_ORDER doesn't work
-    meta_alloc: LockedHeap<16>,
+    meta_alloc: LockedHeap<16>
 }
 
 impl OtaAllocator {
     pub const fn new() -> Self {
-        // this is needed because arr! doesn't accept MAX_THREADS_NO
-        // if consts::MAX_THREADS_NO != 32768 {
-        //     panic!();
-        // }
-
-        let mut tid = 0;
         OtaAllocator {
-            tid2meta: arr_macro::arr![ThreadMeta::new({ tid += 1; tid - 1 }); 3],
+            using_meta_allocator: AtomicUsize::new(0),
+            meta: RwLock::new(Metadata::new()),
             meta_alloc: LockedHeap::new(),
         }
     }
 
-    // this function must be call EXACTLY once before using the allocator
-    // TODO maybe make this function with &self instead of &mut self
+    // this function must be called EXACTLY once before using the allocator
     pub fn init(&mut self) {
+        self.meta.write().init();
+
         unsafe {
-            if let Err(err) = mman_wrapper::mmap(consts::META_ADDR_START as *mut u8,
-                                                 consts::META_HEAP_SIZE) {
-                panic!("Error with code: {}, when calling mmap for allocating heap memory!", err);
+            if let Err(err) =
+                mman_wrapper::mmap(consts::META_ADDR_SPACE as *mut u8, 8192)
+            {
+                panic!(
+                    "Error with code: {}, when calling mmap for allocating heap memory!",
+                    err
+                );
             }
+
+            // println!("AAAAAAAAAAAAAA: {}", consts::META_SPACE_SIZE);
 
             self.meta_alloc
                 .lock()
-                .init(consts::META_ADDR_START, consts::META_HEAP_SIZE);
+                .init(consts::META_ADDR_SPACE, 8192);
         }
     }
 }
@@ -50,17 +59,60 @@ impl OtaAllocator {
 unsafe impl GlobalAlloc for OtaAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let tid = utils::get_current_tid();
-        let tmeta = &self.tid2meta[tid];
+        eprintln!("TID: {}", tid);
 
-        if *tmeta.use_meta_alloc.borrow() {
+        if self.using_meta_allocator.compare_exchange(tid, tid, Ordering::Relaxed, Ordering::Relaxed).is_ok() {
             return self.meta_alloc.alloc(layout);
         }
+
+        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked1");
+        let mut rlocked_meta = self.meta.read();
+        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked1!!!!!");
+
+        let tmeta = match rlocked_meta.get_tmeta_for_tid(tid) {
+            None => {
+                // dropping the read lock earlier, so we can get the write lock
+                mem::drop(rlocked_meta);
+
+                // getting the write lock trough an upgradeable read lock to avoid write starvation
+                eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked2");
+                let mut wlocked_meta = self.meta.upgradeable_read().upgrade();
+                eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked2!!!!!");
+                self.using_meta_allocator.store(tid, Ordering::Relaxed);
+                wlocked_meta.add_new_thread(tid);
+                self.using_meta_allocator.store(0, Ordering::Relaxed);
+
+                // dropping the write lock earlier, to release waiting reading threads
+                mem::drop(wlocked_meta);
+
+                // regaining the read lock
+                eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked3");
+                rlocked_meta = self.meta.read();
+                eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked3!!!!!");
+
+                rlocked_meta.get_tmeta_for_tid(tid).unwrap()
+            },
+
+            Some(tmeta) => tmeta
+        };
+
+        if *tmeta.use_meta_alloc.borrow() {
+            eprintln!("BAMBAM!1");
+            return self.meta_alloc.alloc(layout);
+        }
+
+        eprintln!("BAMBAM!!!! 2");
 
         // this call isn't protected by a lock, because it only reads/writes thread local data
         let next_addr = tmeta.next_addr(layout);
 
+        eprintln!("BAMBAM!!!! 3");
+
         // start of the critical region protected by addr2meta lock
+        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked4");
         let mut locked_addr2meta = tmeta.addr2meta.lock();
+        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked4!!!!!");
+
         let addr2meta = locked_addr2meta.get_or_insert(HashMap::new());
 
         // insert might trigger a call for alloc and dealloc, handled by the meta allocator
@@ -73,7 +125,12 @@ unsafe impl GlobalAlloc for OtaAllocator {
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
         let tid = utils::get_current_tid();
-        let tmeta = &self.tid2meta[tid];
+
+        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked5");
+        let rlocked_meta = self.meta.read();
+        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked5!!!!!");
+
+        let tmeta = rlocked_meta.get_tmeta_for_tid(tid).unwrap();
 
         if utils::is_meta_addr(ptr) {
             if *tmeta.use_meta_alloc.borrow() {
@@ -85,8 +142,8 @@ unsafe impl GlobalAlloc for OtaAllocator {
         }
 
         // the metadata of the thread that allocated this address (might be different from tid)
-        let alloc_tid = utils::get_tid_for_addr(ptr as usize);
-        let alloc_tmeta = &self.tid2meta[alloc_tid];
+        // let alloc_tid =
+        let alloc_tmeta = rlocked_meta.get_tmeta_for_addr(ptr as usize).unwrap();
 
         // TODO maybe move this someplace else, like we did with next_addr method
         //  make the call to munmap, and find the size of the memory, don't use layout.size()
@@ -96,7 +153,9 @@ unsafe impl GlobalAlloc for OtaAllocator {
         }
 
         // start of the critical region protected by addr2meta lock
+        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked6");
         let mut locked_addr2meta = alloc_tmeta.addr2meta.lock();
+        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked6!!!!!");
 
         // TODO handle the None case
         let addr2meta = locked_addr2meta.as_mut().unwrap();
