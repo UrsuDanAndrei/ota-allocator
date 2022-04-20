@@ -7,28 +7,27 @@ mod utils;
 use buddy_system_allocator::LockedHeap;
 use core::alloc::{GlobalAlloc, Layout};
 use core::cell::RefCell;
-use hashbrown::HashMap;
-use metadata::{Metadata, AddrMeta, ThreadMeta};
-use spin::RwLock;
-use utils::consts;
 use core::mem;
 use core::sync::atomic::AtomicUsize;
 use core::sync::atomic::Ordering;
+use hashbrown::HashMap;
 use libc_print::std_name::*;
+use metadata::{AddrMeta, Metadata, ThreadMeta};
+use spin::RwLock;
+use utils::consts;
 
 pub struct OtaAllocator {
-    using_meta_allocator: AtomicUsize,
+    use_meta_allocator: AtomicUsize,
     meta: RwLock<Metadata>,
 
     // FIXME, figure out the proper ORDER value here, using 16 for now
-    //  also figure out why using consts::BUDDY_ALLOCATOR_ORDER doesn't work
-    meta_alloc: LockedHeap<16>
+    meta_alloc: LockedHeap<{ consts::BUDDY_ALLOCATOR_ORDER }>,
 }
 
 impl OtaAllocator {
     pub const fn new() -> Self {
         OtaAllocator {
-            using_meta_allocator: AtomicUsize::new(0),
+            use_meta_allocator: AtomicUsize::new(0),
             meta: RwLock::new(Metadata::new()),
             meta_alloc: LockedHeap::new(),
         }
@@ -40,17 +39,18 @@ impl OtaAllocator {
 
         unsafe {
             if let Err(err) =
-                mman_wrapper::mmap(consts::META_ADDR_SPACE as *mut u8, 8192)
+                mman_wrapper::mmap(consts::META_ADDR_SPACE as *mut u8, consts::META_SPACE_SIZE)
             {
-                eprintln!("Error with code: {}, when calling mmap for allocating heap memory!", err);
+                eprintln!(
+                    "Error with code: {}, when calling mmap for allocating heap memory!",
+                    err
+                );
                 panic!("");
             }
 
-            // println!("AAAAAAAAAAAAAA: {}", consts::META_SPACE_SIZE);
-
             self.meta_alloc
                 .lock()
-                .init(consts::META_ADDR_SPACE, 8192);
+                .init(consts::META_ADDR_SPACE, consts::META_SPACE_SIZE);
         }
     }
 }
@@ -59,7 +59,11 @@ unsafe impl GlobalAlloc for OtaAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let tid = utils::get_current_tid();
 
-        if self.using_meta_allocator.compare_exchange(tid, tid, Ordering::Relaxed, Ordering::Relaxed).is_ok() {
+        if self
+            .use_meta_allocator
+            .compare_exchange(tid, tid, Ordering::Relaxed, Ordering::Relaxed)
+            .is_ok()
+        {
             return self.meta_alloc.alloc(layout);
         }
 
@@ -73,9 +77,9 @@ unsafe impl GlobalAlloc for OtaAllocator {
                 // getting the write lock trough an upgradeable read lock to avoid write starvation
                 let mut wlocked_meta = self.meta.upgradeable_read().upgrade();
 
-                self.using_meta_allocator.store(tid, Ordering::Relaxed);
+                self.use_meta_allocator.store(tid, Ordering::Relaxed);
                 wlocked_meta.add_new_thread(tid);
-                self.using_meta_allocator.store(0, Ordering::Relaxed);
+                self.use_meta_allocator.store(0, Ordering::Relaxed);
 
                 // dropping the write lock earlier, to release waiting reading threads
                 mem::drop(wlocked_meta);
@@ -84,9 +88,9 @@ unsafe impl GlobalAlloc for OtaAllocator {
                 rlocked_meta = self.meta.read();
 
                 rlocked_meta.get_tmeta_for_tid(tid).unwrap()
-            },
+            }
 
-            Some(tmeta) => tmeta
+            Some(tmeta) => tmeta,
         };
 
         if *tmeta.use_meta_alloc.borrow() {
@@ -95,7 +99,6 @@ unsafe impl GlobalAlloc for OtaAllocator {
 
         // this call isn't protected by a lock, because it only reads/writes thread local data
         let next_addr = tmeta.next_addr(layout);
-
 
         // start of the critical region protected by addr2meta lock
         let mut locked_addr2meta = tmeta.addr2meta.lock();
@@ -112,8 +115,16 @@ unsafe impl GlobalAlloc for OtaAllocator {
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
         let tid = utils::get_current_tid();
-        let rlocked_meta = self.meta.read();
 
+        if self
+            .use_meta_allocator
+            .compare_exchange(tid, tid, Ordering::Relaxed, Ordering::Relaxed)
+            .is_ok()
+        {
+            self.meta_alloc.dealloc(ptr, layout);
+        }
+
+        let rlocked_meta = self.meta.read();
         let tmeta = rlocked_meta.get_tmeta_for_tid(tid).unwrap();
 
         if utils::is_meta_addr(ptr) {
