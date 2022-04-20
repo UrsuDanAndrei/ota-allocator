@@ -1,3 +1,5 @@
+#![no_std]
+
 #![feature(const_fn_trait_bound)]
 #![feature(custom_test_frameworks)]
 #![test_runner(test_runner)]
@@ -9,6 +11,7 @@ extern crate alloc;
 use commons::AllocatorTestWrapper;
 use ota_allocator::OtaAllocator;
 use alloc::{boxed::Box, vec::Vec};
+use libc_print::std_name::*;
 
 #[global_allocator]
 static mut ALLOCATOR: AllocatorTestWrapper<OtaAllocator> =
@@ -17,31 +20,23 @@ static mut ALLOCATOR: AllocatorTestWrapper<OtaAllocator> =
 pub fn test_runner(tests: &[&dyn Fn()]) {
     unsafe {
         ALLOCATOR.allocator.init();
-        eprintln!("Done init!");
         commons::test_runner(tests, &mut ALLOCATOR);
     }
 }
 
 #[test_case]
 fn simple_box_allocation() {
-    println!("testing simple_box_allocation... ");
-    // unsafe { ALLOCATOR.use_wrapped_allocator = true; }
+    print!("testing simple_box_allocation... ");
 
-    {
-        let x = Box::new(2);
-        println!("HERE1");
-        assert_eq!(*x, 2);
-        println!("HERE2");
-    }
+    let x = Box::new(2);
+    assert_eq!(*x, 2);
 
-    // unsafe { ALLOCATOR.use_wrapped_allocator = false; }
     println!("OK");
 }
 
 #[test_case]
 fn multiple_boxes_allocation() {
     print!("testing multiple_boxes_allocation... ");
-    // unsafe { ALLOCATOR.use_wrapped_allocator = true; }
 
     let x = Box::new(2);
     assert_eq!(*x, 2);
@@ -52,7 +47,6 @@ fn multiple_boxes_allocation() {
     let z = Box::new(4);
     assert_eq!(*z, 4);
 
-    // unsafe { ALLOCATOR.use_wrapped_allocator = false; }
     println!("OK");
 }
 

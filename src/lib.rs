@@ -1,4 +1,4 @@
-// #![no_std]
+#![no_std]
 
 mod metadata;
 mod mman_wrapper;
@@ -13,7 +13,8 @@ use spin::RwLock;
 use utils::consts;
 use core::mem;
 use core::sync::atomic::AtomicUsize;
-use std::sync::atomic::Ordering;
+use core::sync::atomic::Ordering;
+use libc_print::std_name::*;
 
 pub struct OtaAllocator {
     using_meta_allocator: AtomicUsize,
@@ -41,10 +42,8 @@ impl OtaAllocator {
             if let Err(err) =
                 mman_wrapper::mmap(consts::META_ADDR_SPACE as *mut u8, 8192)
             {
-                panic!(
-                    "Error with code: {}, when calling mmap for allocating heap memory!",
-                    err
-                );
+                eprintln!("Error with code: {}, when calling mmap for allocating heap memory!", err);
+                panic!("");
             }
 
             // println!("AAAAAAAAAAAAAA: {}", consts::META_SPACE_SIZE);
@@ -59,15 +58,12 @@ impl OtaAllocator {
 unsafe impl GlobalAlloc for OtaAllocator {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let tid = utils::get_current_tid();
-        eprintln!("TID: {}", tid);
 
         if self.using_meta_allocator.compare_exchange(tid, tid, Ordering::Relaxed, Ordering::Relaxed).is_ok() {
             return self.meta_alloc.alloc(layout);
         }
 
-        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked1");
         let mut rlocked_meta = self.meta.read();
-        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked1!!!!!");
 
         let tmeta = match rlocked_meta.get_tmeta_for_tid(tid) {
             None => {
@@ -75,9 +71,8 @@ unsafe impl GlobalAlloc for OtaAllocator {
                 mem::drop(rlocked_meta);
 
                 // getting the write lock trough an upgradeable read lock to avoid write starvation
-                eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked2");
                 let mut wlocked_meta = self.meta.upgradeable_read().upgrade();
-                eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked2!!!!!");
+
                 self.using_meta_allocator.store(tid, Ordering::Relaxed);
                 wlocked_meta.add_new_thread(tid);
                 self.using_meta_allocator.store(0, Ordering::Relaxed);
@@ -86,9 +81,7 @@ unsafe impl GlobalAlloc for OtaAllocator {
                 mem::drop(wlocked_meta);
 
                 // regaining the read lock
-                eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked3");
                 rlocked_meta = self.meta.read();
-                eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked3!!!!!");
 
                 rlocked_meta.get_tmeta_for_tid(tid).unwrap()
             },
@@ -97,21 +90,15 @@ unsafe impl GlobalAlloc for OtaAllocator {
         };
 
         if *tmeta.use_meta_alloc.borrow() {
-            eprintln!("BAMBAM!1");
             return self.meta_alloc.alloc(layout);
         }
-
-        eprintln!("BAMBAM!!!! 2");
 
         // this call isn't protected by a lock, because it only reads/writes thread local data
         let next_addr = tmeta.next_addr(layout);
 
-        eprintln!("BAMBAM!!!! 3");
 
         // start of the critical region protected by addr2meta lock
-        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked4");
         let mut locked_addr2meta = tmeta.addr2meta.lock();
-        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked4!!!!!");
 
         let addr2meta = locked_addr2meta.get_or_insert(HashMap::new());
 
@@ -125,10 +112,7 @@ unsafe impl GlobalAlloc for OtaAllocator {
 
     unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
         let tid = utils::get_current_tid();
-
-        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked5");
         let rlocked_meta = self.meta.read();
-        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked5!!!!!");
 
         let tmeta = rlocked_meta.get_tmeta_for_tid(tid).unwrap();
 
@@ -137,7 +121,8 @@ unsafe impl GlobalAlloc for OtaAllocator {
                 self.meta_alloc.dealloc(ptr, layout);
                 return;
             } else {
-                panic!("Invalid metadata free attempt! This might be a security issue!");
+                eprintln!("Invalid metadata free attempt! This might be a security issue!");
+                panic!("");
             }
         }
 
@@ -149,13 +134,12 @@ unsafe impl GlobalAlloc for OtaAllocator {
         //  make the call to munmap, and find the size of the memory, don't use layout.size()
         //  since it is not compatible with the c free api
         if let Err(err) = mman_wrapper::munmap(ptr, layout.size()) {
-            panic!("Error with code: {}, when calling unmap!", err);
+            eprintln!("Error with code: {}, when calling unmap!", err);
+            panic!("");
         }
 
         // start of the critical region protected by addr2meta lock
-        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA Blocked6");
         let mut locked_addr2meta = alloc_tmeta.addr2meta.lock();
-        eprintln!("AAAAAAAAAAAAAAAAAAAAAAAAAA DEBlocked6!!!!!");
 
         // TODO handle the None case
         let addr2meta = locked_addr2meta.as_mut().unwrap();
