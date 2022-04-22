@@ -8,19 +8,20 @@ mod commons;
 
 extern crate alloc;
 
-use commons::AllocatorTestWrapper;
+use commons::AllocTestWrapper;
 use ota_allocator::OtaAllocator;
 use alloc::{boxed::Box, vec::Vec};
 use libc_print::std_name::*;
+use lazy_static::lazy_static;
 
 #[global_allocator]
-static mut ALLOCATOR: AllocatorTestWrapper<OtaAllocator> =
-    AllocatorTestWrapper::new(OtaAllocator::new());
+static mut ALLOCATOR: AllocTestWrapper<OtaAllocator> =
+    AllocTestWrapper::new(OtaAllocator::new());
 
 pub fn test_runner(tests: &[&dyn Fn()]) {
     unsafe {
-        ALLOCATOR.allocator.init();
-        commons::test_runner(tests, &mut ALLOCATOR);
+        ALLOCATOR.tested_alloc.init();
+        commons::test_runner(tests, &ALLOCATOR);
     }
 }
 

@@ -1,8 +1,8 @@
 #![no_std]
 
 mod metadata;
-mod mman_wrapper;
-mod utils;
+pub mod mman_wrapper;
+pub mod utils;
 
 use buddy_system_allocator::LockedHeap;
 use core::alloc::{GlobalAlloc, Layout};
@@ -15,13 +15,21 @@ use libc_print::std_name::*;
 use metadata::{AddrMeta, Metadata, ThreadMeta};
 use spin::RwLock;
 use utils::consts;
+use core::marker::Sync;
+
+// #[cfg(test)]
+pub use mman_wrapper::*;
+
+// #[cfg(test)]
+pub use consts::META_ADDR_SPACE_START;
+
+// #[cfg(test)]
+pub use consts::META_ADDR_SPACE_SIZE;
 
 pub struct OtaAllocator {
     use_meta_allocator: AtomicUsize,
     meta: RwLock<Metadata>,
-
-    // FIXME, figure out the proper ORDER value here, using 16 for now
-    meta_alloc: LockedHeap<{ consts::BUDDY_ALLOCATOR_ORDER }>,
+    meta_alloc: LockedHeap<{ consts::BUDDY_ALLOCATOR_ORDER }>
 }
 
 impl OtaAllocator {
@@ -39,7 +47,7 @@ impl OtaAllocator {
 
         unsafe {
             if let Err(err) =
-                mman_wrapper::mmap(consts::META_ADDR_SPACE as *mut u8, consts::META_SPACE_SIZE)
+                mman_wrapper::mmap(consts::META_ADDR_SPACE_START as *mut u8, consts::META_ADDR_SPACE_SIZE)
             {
                 eprintln!(
                     "Error with code: {}, when calling mmap for allocating heap memory!",
@@ -50,7 +58,7 @@ impl OtaAllocator {
 
             self.meta_alloc
                 .lock()
-                .init(consts::META_ADDR_SPACE, consts::META_SPACE_SIZE);
+                .init(consts::META_ADDR_SPACE_START, consts::META_ADDR_SPACE_SIZE);
         }
     }
 }

@@ -21,5 +21,5 @@ pub fn get_current_tid() -> usize {
 
 #[inline(always)]
 pub fn is_meta_addr(addr: *mut u8) -> bool {
-    addr as usize & consts::ADDR_SPACE_MASK == consts::META_ADDR_SPACE
+    addr as usize & consts::ADDR_SPACE_MASK == consts::META_ADDR_SPACE_START
 }

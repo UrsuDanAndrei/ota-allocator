@@ -21,7 +21,7 @@ pub struct Metadata {
 impl Metadata {
     pub const fn new() -> Self {
         Metadata {
-            next_addr_space: consts::FIRST_ADDR_SPACE,
+            next_addr_space: consts::FIRST_ADDR_SPACE_START,
             addr2tid: None,
             tid2tmeta: None
         }
