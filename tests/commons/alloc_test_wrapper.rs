@@ -13,6 +13,9 @@ enum AllocatorType {
     Standard,
 }
 
+// FIXME, malloc allocations, even though small, can interfere with the address space of the tested
+//  allocator. This might cause tests to fail even though there are no problems with the tested
+//  allocator. We might need to address this problem, even though it is highly unlikely to happen
 impl<T: GlobalAlloc> AllocTestWrapper<T> {
     pub const fn new(allocator: T) -> Self {
         Self {

@@ -1,6 +1,8 @@
 // FIXME, figure out the proper ORDER value here, using 16 for now
 pub const BUDDY_ALLOCATOR_ORDER: usize = 16;
 
+pub const MAX_THREADS_NO: usize = 128;
+
 // TODO manage address spaces
 pub const FIRST_ADDR_SPACE_START: usize = 0x0000_7FFD_0000_0000;
 pub const ADDR_SPACE_SIZE: usize = 0x0000_0001_0000_0000;
