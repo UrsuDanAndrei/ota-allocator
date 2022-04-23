@@ -22,26 +22,30 @@ use utils::consts;
 // TODO maybe type OtaAllocator with MA too, so the user can easily give an metadata allocator
 pub struct OtaAllocator<'a> {
     use_meta_allocator: AtomicUsize,
+
     // TODO move the Option from Metadata hashmaps here!
     meta: RwLock<Metadata<'a, LockedHeap<{ consts::BUDDY_ALLOCATOR_ORDER }>>>,
+
+    meta_alloc: MetaAllocWrapper<LockedHeap<{ consts::BUDDY_ALLOCATOR_ORDER }>>
 }
 
 impl<'a> OtaAllocator<'a> {
     pub const fn new() -> Self {
         OtaAllocator {
             use_meta_allocator: AtomicUsize::new(0),
-            meta: RwLock::new(Metadata::new_in(LockedHeap::<{ consts::BUDDY_ALLOCATOR_ORDER }>::new()))
+            meta: RwLock::new(Metadata::new()),
+            meta_alloc: MetaAllocWrapper::new(LockedHeap::new())
         }
     }
 
     // this function must be called EXACTLY once before using the allocator
     pub fn init(&'a mut self) {
-        unsafe { self.init_buddy_alloc(); }
+        unsafe { self.init_meta_alloc(); }
         let mut wlocked_meta = self.meta.write();
-        wlocked_meta.init();
+        wlocked_meta.init(&self.meta_alloc);
     }
 
-    unsafe fn init_buddy_alloc(&mut self) {
+    unsafe fn init_meta_alloc(&mut self) {
         if let Err(err) = mman_wrapper::mmap(
             consts::META_ADDR_SPACE_START as *mut u8,
             consts::META_ADDR_SPACE_SIZE,
@@ -53,8 +57,7 @@ impl<'a> OtaAllocator<'a> {
             panic!("");
         }
 
-        let mut wlocked_meta = self.meta.write();
-        wlocked_meta.meta_alloc.allocator.lock()
+        self.meta_alloc.allocator.lock()
             .init(consts::META_ADDR_SPACE_START, consts::META_ADDR_SPACE_SIZE);
     }
 }

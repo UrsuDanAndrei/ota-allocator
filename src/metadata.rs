@@ -21,37 +21,34 @@ pub struct Metadata<'ma, MA: GlobalAlloc> {
     addr2tid: Option<HashMap<usize, usize, DefaultHashBuilder, &'ma MetaAllocWrapper<MA>>>,
 
     tid2tmeta: Option<HashMap<usize, ThreadMeta<'ma, MA>, DefaultHashBuilder, &'ma MetaAllocWrapper<MA>>>,
-
-    meta_alloc: MetaAllocWrapper<MA>,
 }
 
 impl<'ma, MA: GlobalAlloc> Metadata<'ma, MA> {
-    pub const fn new_in(allocator: MA) -> Self {
+    pub const fn new() -> Self {
         Metadata {
             next_addr_space: consts::FIRST_ADDR_SPACE_START,
             addr2tid: None,
             tid2tmeta: None,
-            meta_alloc: MetaAllocWrapper::new(allocator),
         }
     }
 
-    pub fn init(&'ma mut self) {
+    pub fn init(&mut self, meta_alloc: &'ma MetaAllocWrapper<MA>) {
         // TODO consts::MAX_THREADS_NO might not be necessary!
         self.addr2tid = Some(HashMap::with_capacity_in(
             consts::MAX_THREADS_NO,
-            &self.meta_alloc,
+            meta_alloc,
         ));
 
         self.tid2tmeta = Some(HashMap::with_capacity_in(
             consts::MAX_THREADS_NO,
-            &self.meta_alloc,
+            meta_alloc,
         ));
     }
 
-    pub fn add_new_thread(&'ma mut self, tid: usize) {
+    pub fn add_new_thread(&mut self, tid: usize, meta_alloc: &'ma MetaAllocWrapper<MA>) {
         // new thread => new associated ThreadMeta structure
         let tid2meta = self.tid2tmeta.as_mut().unwrap();
-        tid2meta.insert(tid, ThreadMeta::new_in(self.next_addr_space, &self.meta_alloc));
+        tid2meta.insert(tid, ThreadMeta::new_in(self.next_addr_space, meta_alloc));
 
         // new thread => new address space
         self.next_addr_space -= consts::ADDR_SPACE_SIZE;
