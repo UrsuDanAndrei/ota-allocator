@@ -23,8 +23,9 @@ use utils::consts;
 pub struct OtaAllocator<'a> {
     use_meta_allocator: AtomicUsize,
 
-    // TODO move the Option from Metadata hashmaps here!
-    meta: RwLock<Metadata<'a, LockedHeap<{ consts::BUDDY_ALLOCATOR_ORDER }>>>,
+    // TODO make your own wrapper or find a better one instead of using Option
+    //  we need option here because HashMap::new can't be called from a constant function
+    meta: Option<RwLock<Metadata<'a, LockedHeap<{ consts::BUDDY_ALLOCATOR_ORDER }>>>>,
 
     meta_alloc: MetaAllocWrapper<LockedHeap<{ consts::BUDDY_ALLOCATOR_ORDER }>>
 }
@@ -33,7 +34,7 @@ impl<'a> OtaAllocator<'a> {
     pub const fn new() -> Self {
         OtaAllocator {
             use_meta_allocator: AtomicUsize::new(0),
-            meta: RwLock::new(Metadata::new()),
+            meta: None,
             meta_alloc: MetaAllocWrapper::new(LockedHeap::new())
         }
     }
@@ -41,8 +42,7 @@ impl<'a> OtaAllocator<'a> {
     // this function must be called EXACTLY once before using the allocator
     pub fn init(&'a mut self) {
         unsafe { self.init_meta_alloc(); }
-        let mut wlocked_meta = self.meta.write();
-        wlocked_meta.init(&self.meta_alloc);
+        self.meta = Some(RwLock::new(Metadata::new_in(&self.meta_alloc)));
     }
 
     unsafe fn init_meta_alloc(&mut self) {
