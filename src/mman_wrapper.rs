@@ -1,7 +1,7 @@
 use libc;
 use errno_no_std;
 
-pub unsafe fn mmap(addr: *mut u8, size: usize) -> Result<(), i32> {
+pub unsafe fn mmap(addr: usize, size: usize) -> Result<(), i32> {
 
     let mmap_addr = libc::mmap(addr as *mut libc::c_void, size,
                                libc::PROT_READ | libc::PROT_WRITE,
@@ -12,12 +12,12 @@ pub unsafe fn mmap(addr: *mut u8, size: usize) -> Result<(), i32> {
         Err(errno_no_std::errno().0)
     } else {
         // TODO, research if this assert is really necessary
-        assert_eq!(mmap_addr as *mut u8, addr);
+        // assert_eq!(mmap_addr, addr);
         Ok(())
     }
 }
 
-pub unsafe fn munmap(addr: *mut u8, size: usize) -> Result<(), i32> {
+pub unsafe fn munmap(addr: usize, size: usize) -> Result<(), i32> {
     // TODO maybe assert if addr is page aligned
     // TODO try as _ instead
     let err = libc::munmap(addr as *mut libc::c_void, size);

@@ -1,11 +1,11 @@
 pub struct AddrMeta {
-    _x: usize
+    pub(crate) size: usize
 }
 
 impl AddrMeta {
-    pub fn new(x: usize) -> Self {
+    pub fn new(size: usize) -> Self {
         AddrMeta {
-            _x: x
+            size
         }
     }
 }
