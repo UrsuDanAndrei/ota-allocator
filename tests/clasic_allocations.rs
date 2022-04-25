@@ -1,6 +1,8 @@
 #![no_std]
 #![feature(custom_test_frameworks)]
 #![test_runner(test_runner)]
+#![feature(default_alloc_error_handler)]
+#![feature(core_panic)]
 
 mod commons;
 
@@ -9,7 +11,6 @@ extern crate alloc;
 use alloc::{boxed::Box, vec::Vec};
 use buddy_system_allocator::LockedHeap;
 use commons::AllocTestWrapper;
-use lazy_static::lazy_static;
 use libc_print::std_name::*;
 use ota_allocator::OtaAllocator;
 
@@ -17,7 +18,7 @@ type MetaTestAlloc = LockedHeap<{ commons::BUDDY_ALLOCATOR_ORDER }>;
 
 #[global_allocator]
 static mut ALLOCATOR: AllocTestWrapper<OtaAllocator<MetaTestAlloc>> =
-    AllocTestWrapper::new(OtaAllocator::new(MetaTestAlloc::new()));
+    AllocTestWrapper::new(OtaAllocator::new_in(MetaTestAlloc::new()));
 
 pub fn test_runner(tests: &[&dyn Fn()]) {
     unsafe {

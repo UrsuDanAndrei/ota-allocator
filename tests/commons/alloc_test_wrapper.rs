@@ -1,9 +1,5 @@
 use buddy_system_allocator::LockedHeap;
 use core::alloc::{GlobalAlloc, Layout};
-use core::cell::RefCell;
-use core::sync::atomic::AtomicBool;
-use libc;
-use libc_print::std_name::*;
 use spin::Once;
 
 pub struct AllocTestWrapper<T: GlobalAlloc> {

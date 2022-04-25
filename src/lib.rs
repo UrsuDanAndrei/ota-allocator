@@ -7,40 +7,31 @@ mod metadata;
 pub mod mman_wrapper;
 pub mod utils;
 
-use buddy_system_allocator::LockedHeap;
 use core::alloc::{GlobalAlloc, Layout};
-use core::cell::RefCell;
-use core::marker::Sync;
 use core::mem;
-use core::panicking::panic;
-use core::sync::atomic::AtomicUsize;
-use core::sync::atomic::Ordering;
-use hashbrown::HashMap;
 use libc_print::std_name::*;
-use metadata::{AddrMeta, AllocatorWrapper, Metadata, ThreadMeta};
-use spin::{Mutex, RwLock, RwLockReadGuard, RwLockWriteGuard};
+use metadata::{AllocatorWrapper, Metadata};
+use spin::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use utils::consts;
 
 // reexports
-pub use consts::{META_ADDR_SPACE_START, META_ADDR_SPACE_MAX_SIZE};
+pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
 
 // reexports to be used for testing
-pub use consts::{TEST_ADDR_SPACE_START, TEST_ADDR_SPACE_MAX_SIZE};
+pub use consts::{TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START};
 
 pub struct OtaAllocator<'a, GA: GlobalAlloc> {
-    use_meta_allocator: AtomicUsize,
-
-    // TODO make your own wrapper or find a better one instead of using Option
-    //  we need option here because HashMap::new can't be called from a constant function
+    // TODO find a way out of using Option here, this is the only thing that makes use of
+    //  the init method, it would be great if we could get rid of it
+    //
+    // we need option here because HashMap::new can't be called from a constant function
     meta: Option<RwLock<Metadata<'a, AllocatorWrapper<GA>>>>,
-
     meta_alloc: AllocatorWrapper<GA>,
 }
 
 impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
-    pub const fn new(meta_alloc: GA) -> Self {
+    pub const fn new_in(meta_alloc: GA) -> Self {
         OtaAllocator {
-            use_meta_allocator: AtomicUsize::new(0),
             meta: None,
             meta_alloc: AllocatorWrapper::new(meta_alloc),
         }
@@ -48,22 +39,21 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
 
     // this function must be called EXACTLY once before using the allocator
     pub fn init(&'a mut self) {
-        self.meta = Some(RwLock::new(Metadata::new_in(&self.meta_alloc)));
+        self.meta = Some(RwLock::new(Metadata::new_in(
+            consts::FIRST_ADDR_SPACE_START,
+            &self.meta_alloc,
+        )));
     }
 
     pub fn meta_alloc(&self) -> &GA {
         self.meta_alloc.wrapped_allocator()
     }
 
-    pub fn read_meta(
-        &self,
-    ) -> RwLockReadGuard<Metadata<'a, AllocatorWrapper<GA>>> {
+    pub fn read_meta(&self) -> RwLockReadGuard<Metadata<'a, AllocatorWrapper<GA>>> {
         self.meta.as_ref().unwrap().read()
     }
 
-    pub fn write_meta(
-        &self,
-    ) -> RwLockWriteGuard<Metadata<'a, AllocatorWrapper<GA>>> {
+    pub fn write_meta(&self) -> RwLockWriteGuard<Metadata<'a, AllocatorWrapper<GA>>> {
         // getting the write lock trough an upgradeable read lock to avoid write starvation
         self.meta.as_ref().unwrap().upgradeable_read().upgrade()
     }
@@ -93,21 +83,21 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
             Some(tmeta) => tmeta,
         };
 
-        let addr = tmeta.lock().next_addr(layout); addr as *mut u8
+        let addr = tmeta.lock().next_addr(layout);
+        addr as *mut u8
     }
 
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
+    unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
         let addr = ptr as usize;
         let read_meta = self.read_meta();
-        let addr_tmeta = read_meta.get_addr_tmeta(addr);
 
-        match addr_tmeta {
+        match read_meta.get_addr_tmeta(addr) {
             None => {
                 eprintln!("Invalid or double free!");
                 panic!("");
-            },
+            }
 
-            Some(addr_tmeta) => addr_tmeta.lock().free_addr(addr)
+            Some(addr_tmeta) => addr_tmeta.lock().free_addr(addr),
         };
     }
 }

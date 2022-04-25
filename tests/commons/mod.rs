@@ -28,9 +28,7 @@ pub unsafe fn init_buddy_allocator(
     addr_space_start: usize,
     addr_space_size: usize,
 ) {
-    if let Err(err) =
-        mman_wrapper::mmap(addr_space_start, addr_space_size)
-    {
+    if let Err(err) = mman_wrapper::mmap(addr_space_start, addr_space_size) {
         eprintln!(
             "Error with code: {}, when calling mmap for allocating heap memory!",
             err
@@ -38,7 +36,5 @@ pub unsafe fn init_buddy_allocator(
         panic!("");
     }
 
-    buddy_alloc
-        .lock()
-        .init(addr_space_start, addr_space_size);
+    buddy_alloc.lock().init(addr_space_start, addr_space_size);
 }

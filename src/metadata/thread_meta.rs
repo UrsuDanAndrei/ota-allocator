@@ -1,15 +1,14 @@
 use super::addr_meta::AddrMeta;
 use crate::consts;
+use crate::mman_wrapper;
 use crate::utils;
-use crate::{mman_wrapper, AllocatorWrapper};
-use core::alloc::{Allocator, GlobalAlloc, Layout};
-use core::cell::RefCell;
+use core::alloc::{Allocator, Layout};
 use core::cmp;
-use core::ptr;
 use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
 use libc_print::std_name::*;
-use spin::Mutex;
+
+// TODO make private what can be private
 
 pub struct ThreadMeta<'a, A: Allocator> {
     last_addr: usize,
@@ -19,8 +18,7 @@ pub struct ThreadMeta<'a, A: Allocator> {
 impl<'a, A: Allocator> ThreadMeta<'a, A> {
     pub fn new_in(last_addr: usize, allocator: &'a A) -> Self {
         ThreadMeta {
-            // TODO figure out an initial capacity for this HashMap
-            addr2ameta: HashMap::new_in(allocator),
+            addr2ameta: HashMap::with_capacity_in(consts::RESV_ADDRS_NO, allocator),
             last_addr,
         }
     }
@@ -38,7 +36,8 @@ impl<'a, A: Allocator> ThreadMeta<'a, A> {
         }
 
         // FIXME AddrMeta::new(layout.size() or self.last_addr - next_addr or something else)
-        self.addr2ameta.insert(next_addr, AddrMeta::new(layout.size()));
+        self.addr2ameta
+            .insert(next_addr, AddrMeta::new(layout.size()));
         self.last_addr = next_addr;
 
         next_addr

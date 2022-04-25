@@ -1,25 +1,11 @@
-// FIXME, this functions need adjustments, BIG adjustments
-
 use super::consts;
 
 #[inline(always)]
-pub const fn get_last_addr_for_tid(tid: usize) -> usize {
-    0xFFFF_8000_0000_0000 + (tid << 32)
-}
-
-#[inline(always)]
-pub fn get_tid_for_addr(addr: usize) -> usize {
-    ((addr - 0xFFFF_8000_0000_0000) >> 32) + 1
+pub fn get_addr_space(addr: usize) -> usize {
+    addr & consts::ADDR_SPACE_MASK
 }
 
 #[inline(always)]
 pub fn get_current_tid() -> usize {
-    unsafe {
-        libc::pthread_self() as usize
-    }
-}
-
-#[inline(always)]
-pub fn is_meta_addr(addr: usize) -> bool {
-    addr & consts::ADDR_SPACE_MASK == consts::META_ADDR_SPACE_START
+    unsafe { libc::pthread_self() as usize }
 }

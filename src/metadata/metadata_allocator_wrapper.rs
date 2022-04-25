@@ -1,16 +1,14 @@
-use core::alloc::{Allocator, AllocError, GlobalAlloc, Layout};
+use core::alloc::{AllocError, Allocator, GlobalAlloc, Layout};
 use core::ptr::NonNull;
 
 // this wrapper is needed because of E0117
 pub struct AllocatorWrapper<GA: GlobalAlloc> {
-    pub allocator: GA
+    pub allocator: GA,
 }
 
 impl<GA: GlobalAlloc> AllocatorWrapper<GA> {
     pub(crate) const fn new(allocator: GA) -> Self {
-        AllocatorWrapper {
-            allocator
-        }
+        AllocatorWrapper { allocator }
     }
 
     pub fn wrapped_allocator(&self) -> &GA {
@@ -24,7 +22,7 @@ unsafe impl<GA: GlobalAlloc> Allocator for AllocatorWrapper<GA> {
 
         match NonNull::new(addr) {
             None => Err(AllocError),
-            Some(addr) => Ok(NonNull::slice_from_raw_parts(addr, layout.size()))
+            Some(addr) => Ok(NonNull::slice_from_raw_parts(addr, layout.size())),
         }
     }
 
