@@ -30,32 +30,28 @@ impl<'ma, MA: GlobalAlloc> Metadata<'ma, MA> {
         }
     }
 
-    pub fn add_new_thread(&mut self, tid: usize, meta_alloc: &'ma MetaAllocWrapper<MA>) {
-        // // new thread => new associated ThreadMeta structure
-        // let tid2meta = self.tid2tmeta.as_mut().unwrap();
-        // tid2meta.insert(tid, ThreadMeta::new_in(self.next_addr_space, meta_alloc));
-        //
-        // // new thread => new address space
-        // self.next_addr_space -= consts::ADDR_SPACE_SIZE;
-        //
-        // // new mapping: new address space -> new thread
-        // let addr2tid = self.addr2tid.as_mut().unwrap();
-        // addr2tid.insert(self.next_addr_space, tid);
+    // TODO maybe make this only &self instead of &mut self
+    pub fn add_new_thread(&mut self, tid: usize) {
+        // new thread => new associated ThreadMeta structure
+        self.tid2tmeta.insert(
+            tid,
+            ThreadMeta::new_in(self.next_addr_space, *self.tid2tmeta.allocator()),
+        );
+
+        // new thread => new address space
+        self.next_addr_space -= consts::ADDR_SPACE_SIZE;
+
+        // new thread => new (address space -> thread) mapping
+        self.addr2tid.insert(self.next_addr_space, tid);
     }
 
-    pub fn get_tmeta_for_tid(&self, tid: usize) -> Option<&ThreadMeta<'ma, MA>> {
-        // self.tid2tmeta.as_ref().unwrap().get(&tid)
-        todo!()
+    pub fn get_tmeta(&self, tid: usize) -> Option<&ThreadMeta<'ma, MA>> {
+        self.tid2tmeta.get(&tid)
     }
 
-    pub fn get_tmeta_for_addr(&self, addr: usize) -> Option<&ThreadMeta<'ma, MA>> {
-        // let tid = *self
-        //     .addr2tid
-        //     .as_ref()
-        //     .unwrap()
-        //     .get(&(addr & consts::ADDR_SPACE_MASK))
-        //     .unwrap();
-        // self.get_tmeta_for_tid(tid)
-        todo!()
+    pub fn get_addr_tmeta(&self, addr: usize) -> Option<&ThreadMeta<'ma, MA>> {
+        self.addr2tid
+            .get(&(addr & consts::ADDR_SPACE_MASK))
+            .and_then(|tid| self.get_tmeta(*tid))
     }
 }
