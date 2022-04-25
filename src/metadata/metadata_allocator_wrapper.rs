@@ -12,6 +12,10 @@ impl<MA: GlobalAlloc> MetaAllocWrapper<MA> {
             allocator
         }
     }
+
+    pub fn wrapped_allocator(&self) -> &MA {
+        &self.allocator
+    }
 }
 
 unsafe impl<MA: GlobalAlloc> Allocator for MetaAllocWrapper<MA> {

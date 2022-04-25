@@ -43,7 +43,7 @@ impl<'ma, MA: GlobalAlloc> Metadata<'ma, MA> {
         );
 
         // new thread => new address space
-        self.next_addr_space -= consts::ADDR_SPACE_SIZE;
+        self.next_addr_space -= consts::ADDR_SPACE_MAX_SIZE;
 
         // new thread => new (address space -> thread) mapping
         self.addr2tid.insert(self.next_addr_space, tid);

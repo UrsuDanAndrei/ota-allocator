@@ -1,5 +1,4 @@
 #![no_std]
-
 #![feature(custom_test_frameworks)]
 #![test_runner(test_runner)]
 
@@ -7,20 +6,30 @@ mod commons;
 
 extern crate alloc;
 
-use commons::AllocTestWrapper;
-use ota_allocator::OtaAllocator;
 use alloc::{boxed::Box, vec::Vec};
-use libc_print::std_name::*;
+use buddy_system_allocator::LockedHeap;
+use commons::AllocTestWrapper;
 use lazy_static::lazy_static;
+use libc_print::std_name::*;
+use ota_allocator::OtaAllocator;
+
+type MetaTestAlloc = LockedHeap<{ commons::BUDDY_ALLOCATOR_ORDER }>;
 
 #[global_allocator]
-static mut ALLOCATOR: AllocTestWrapper<OtaAllocator> =
-    AllocTestWrapper::new(OtaAllocator::new());
+static mut ALLOCATOR: AllocTestWrapper<OtaAllocator<MetaTestAlloc>> =
+    AllocTestWrapper::new(OtaAllocator::new(MetaTestAlloc::new()));
 
 pub fn test_runner(tests: &[&dyn Fn()]) {
     unsafe {
+        commons::init_buddy_allocator(
+            ALLOCATOR.tested_alloc.meta_alloc(),
+            ota_allocator::META_ADDR_SPACE_START,
+            ota_allocator::META_ADDR_SPACE_MAX_SIZE,
+        );
+
         ALLOCATOR.tested_alloc.init();
-        commons::test_runner(tests, &ALLOCATOR);
+
+        commons::test_runner(tests, &mut ALLOCATOR);
     }
 }
 
