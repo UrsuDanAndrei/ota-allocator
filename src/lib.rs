@@ -17,7 +17,7 @@ use core::sync::atomic::AtomicUsize;
 use core::sync::atomic::Ordering;
 use hashbrown::HashMap;
 use libc_print::std_name::*;
-use metadata::{AddrMeta, MetaAllocWrapper, Metadata, ThreadMeta};
+use metadata::{AddrMeta, AllocatorWrapper, Metadata, ThreadMeta};
 use spin::{Mutex, RwLock, RwLockReadGuard, RwLockWriteGuard};
 use utils::consts;
 
@@ -27,25 +27,22 @@ pub use consts::{META_ADDR_SPACE_START, META_ADDR_SPACE_MAX_SIZE};
 // reexports to be used for testing
 pub use consts::{TEST_ADDR_SPACE_START, TEST_ADDR_SPACE_MAX_SIZE};
 
-// TODO maybe type OtaAllocator with MA too, so the user can easily give an metadata allocator
-pub struct OtaAllocator<'a, MA: GlobalAlloc> {
+pub struct OtaAllocator<'a, GA: GlobalAlloc> {
     use_meta_allocator: AtomicUsize,
 
     // TODO make your own wrapper or find a better one instead of using Option
     //  we need option here because HashMap::new can't be called from a constant function
+    meta: Option<RwLock<Metadata<'a, AllocatorWrapper<GA>>>>,
 
-    // TODO maybe give Metadata directly an MetaAllocWrapper !!!!!!!!!!!!!!!!!!!
-    meta: Option<RwLock<Metadata<'a, MA>>>,
-
-    meta_alloc: MetaAllocWrapper<MA>,
+    meta_alloc: AllocatorWrapper<GA>,
 }
 
-impl<'a, MA: GlobalAlloc> OtaAllocator<'a, MA> {
-    pub const fn new(meta_alloc: MA) -> Self {
+impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
+    pub const fn new(meta_alloc: GA) -> Self {
         OtaAllocator {
             use_meta_allocator: AtomicUsize::new(0),
             meta: None,
-            meta_alloc: MetaAllocWrapper::new(meta_alloc),
+            meta_alloc: AllocatorWrapper::new(meta_alloc),
         }
     }
 
@@ -54,25 +51,25 @@ impl<'a, MA: GlobalAlloc> OtaAllocator<'a, MA> {
         self.meta = Some(RwLock::new(Metadata::new_in(&self.meta_alloc)));
     }
 
-    pub fn meta_alloc(&self) -> &MA {
+    pub fn meta_alloc(&self) -> &GA {
         self.meta_alloc.wrapped_allocator()
     }
 
     pub fn read_meta(
         &self,
-    ) -> RwLockReadGuard<Metadata<'a, MA>> {
+    ) -> RwLockReadGuard<Metadata<'a, AllocatorWrapper<GA>>> {
         self.meta.as_ref().unwrap().read()
     }
 
     pub fn write_meta(
         &self,
-    ) -> RwLockWriteGuard<Metadata<'a, MA>> {
+    ) -> RwLockWriteGuard<Metadata<'a, AllocatorWrapper<GA>>> {
         // getting the write lock trough an upgradeable read lock to avoid write starvation
         self.meta.as_ref().unwrap().upgradeable_read().upgrade()
     }
 }
 
-unsafe impl<'a, MA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, MA> {
+unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let tid = utils::get_current_tid();
         let mut read_meta = self.read_meta();

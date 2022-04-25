@@ -1,8 +1,8 @@
 use super::addr_meta::AddrMeta;
 use crate::consts;
 use crate::utils;
-use crate::{mman_wrapper, MetaAllocWrapper};
-use core::alloc::{GlobalAlloc, Layout};
+use crate::{mman_wrapper, AllocatorWrapper};
+use core::alloc::{Allocator, GlobalAlloc, Layout};
 use core::cell::RefCell;
 use core::cmp;
 use core::ptr;
@@ -11,14 +11,15 @@ use hashbrown::HashMap;
 use libc_print::std_name::*;
 use spin::Mutex;
 
-pub struct ThreadMeta<'ma, MA: GlobalAlloc> {
+pub struct ThreadMeta<'a, A: Allocator> {
     last_addr: usize,
-    pub(crate) addr2ameta: HashMap<usize, AddrMeta, DefaultHashBuilder, &'ma MetaAllocWrapper<MA>>,
+    pub(crate) addr2ameta: HashMap<usize, AddrMeta, DefaultHashBuilder, &'a A>,
 }
 
-impl<'ma, MA: GlobalAlloc> ThreadMeta<'ma, MA> {
-    pub fn new_in(last_addr: usize, allocator: &'ma MetaAllocWrapper<MA>) -> Self {
+impl<'a, A: Allocator> ThreadMeta<'a, A> {
+    pub fn new_in(last_addr: usize, allocator: &'a A) -> Self {
         ThreadMeta {
+            // TODO figure out an initial capacity for this HashMap
             addr2ameta: HashMap::new_in(allocator),
             last_addr,
         }

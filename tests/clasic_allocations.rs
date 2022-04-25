@@ -21,16 +21,19 @@ static mut ALLOCATOR: AllocTestWrapper<OtaAllocator<MetaTestAlloc>> =
 
 pub fn test_runner(tests: &[&dyn Fn()]) {
     unsafe {
-        commons::init_buddy_allocator(
-            ALLOCATOR.tested_alloc.meta_alloc(),
-            ota_allocator::META_ADDR_SPACE_START,
-            ota_allocator::META_ADDR_SPACE_MAX_SIZE,
-        );
-
+        init_meta_alloc();
         ALLOCATOR.tested_alloc.init();
 
         commons::test_runner(tests, &mut ALLOCATOR);
     }
+}
+
+unsafe fn init_meta_alloc() {
+    commons::init_buddy_allocator(
+        ALLOCATOR.tested_alloc.meta_alloc(),
+        ota_allocator::META_ADDR_SPACE_START,
+        ota_allocator::META_ADDR_SPACE_MAX_SIZE,
+    );
 }
 
 #[test_case]

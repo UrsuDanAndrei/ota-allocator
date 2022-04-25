@@ -2,23 +2,23 @@ use core::alloc::{Allocator, AllocError, GlobalAlloc, Layout};
 use core::ptr::NonNull;
 
 // this wrapper is needed because of E0117
-pub struct MetaAllocWrapper<MA: GlobalAlloc> {
-    pub allocator: MA
+pub struct AllocatorWrapper<GA: GlobalAlloc> {
+    pub allocator: GA
 }
 
-impl<MA: GlobalAlloc> MetaAllocWrapper<MA> {
-    pub(crate) const fn new(allocator: MA) -> Self {
-        MetaAllocWrapper {
+impl<GA: GlobalAlloc> AllocatorWrapper<GA> {
+    pub(crate) const fn new(allocator: GA) -> Self {
+        AllocatorWrapper {
             allocator
         }
     }
 
-    pub fn wrapped_allocator(&self) -> &MA {
+    pub fn wrapped_allocator(&self) -> &GA {
         &self.allocator
     }
 }
 
-unsafe impl<MA: GlobalAlloc> Allocator for MetaAllocWrapper<MA> {
+unsafe impl<GA: GlobalAlloc> Allocator for AllocatorWrapper<GA> {
     fn allocate(&self, layout: Layout) -> Result<NonNull<[u8]>, AllocError> {
         let addr = unsafe { self.allocator.alloc(layout) };
 
