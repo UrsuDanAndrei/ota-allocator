@@ -1,5 +1,5 @@
 pub struct AddrMeta {
-    pub(crate) size: usize,
+    pub size: usize,
 }
 
 impl AddrMeta {

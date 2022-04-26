@@ -1,7 +1,17 @@
-pub mod addr_tid_ops;
-pub mod align;
 pub mod consts;
+pub mod mman_wrapper;
 
-// reexports
-pub use addr_tid_ops::*;
-pub use align::*;
+#[inline(always)]
+pub fn get_addr_space(addr: usize) -> usize {
+    addr & consts::ADDR_SPACE_MASK
+}
+
+#[inline(always)]
+pub fn get_current_tid() -> usize {
+    unsafe { libc::pthread_self() as usize }
+}
+
+#[inline(always)]
+pub fn align_down(addr: usize, align: usize) -> usize {
+    addr & !(align - 1)
+}

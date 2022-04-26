@@ -1,15 +1,13 @@
-pub mod addr_meta;
-pub mod metadata_allocator_wrapper;
-pub mod thread_meta;
+mod allocator_wrapper;
+mod thread_meta;
 
 use core::alloc::Allocator;
 use hashbrown::hash_map::DefaultHashBuilder;
 
 // reexports
-pub use addr_meta::AddrMeta;
-pub use metadata_allocator_wrapper::AllocatorWrapper;
-pub use thread_meta::ThreadMeta;
+pub use allocator_wrapper::AllocatorWrapper;
 
+use thread_meta::ThreadMeta;
 use crate::consts;
 use crate::utils::get_addr_space;
 use hashbrown::HashMap;

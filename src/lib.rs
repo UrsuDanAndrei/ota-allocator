@@ -4,8 +4,16 @@
 #![no_std]
 
 mod metadata;
-pub mod mman_wrapper;
-pub mod utils;
+mod utils;
+
+// reexports
+pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
+
+#[cfg(feature = "integration-test")]
+pub use consts::{TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START};
+
+#[cfg(feature = "integration-test")]
+pub use utils::mman_wrapper;
 
 use core::alloc::{GlobalAlloc, Layout};
 use core::mem;
@@ -13,12 +21,6 @@ use libc_print::std_name::*;
 use metadata::{AllocatorWrapper, Metadata};
 use spin::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use utils::consts;
-
-// reexports
-pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
-
-// reexports to be used for testing
-pub use consts::{TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START};
 
 pub struct OtaAllocator<'a, GA: GlobalAlloc> {
     // TODO find a way out of using Option here, this is the only thing that makes use of
@@ -49,11 +51,11 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
         self.meta_alloc.wrapped_allocator()
     }
 
-    pub fn read_meta(&self) -> RwLockReadGuard<Metadata<'a, AllocatorWrapper<GA>>> {
+    fn read_meta(&self) -> RwLockReadGuard<Metadata<'a, AllocatorWrapper<GA>>> {
         self.meta.as_ref().unwrap().read()
     }
 
-    pub fn write_meta(&self) -> RwLockWriteGuard<Metadata<'a, AllocatorWrapper<GA>>> {
+    fn write_meta(&self) -> RwLockWriteGuard<Metadata<'a, AllocatorWrapper<GA>>> {
         // getting the write lock trough an upgradeable read lock to avoid write starvation
         self.meta.as_ref().unwrap().upgradeable_read().upgrade()
     }

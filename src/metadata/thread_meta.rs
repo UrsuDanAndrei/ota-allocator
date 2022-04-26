@@ -1,6 +1,8 @@
-use super::addr_meta::AddrMeta;
+mod addr_meta;
+
+use addr_meta::AddrMeta;
 use crate::consts;
-use crate::mman_wrapper;
+use crate::utils::mman_wrapper;
 use crate::utils;
 use core::alloc::{Allocator, Layout};
 use core::cmp;
@@ -8,11 +10,9 @@ use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
 use libc_print::std_name::*;
 
-// TODO make private what can be private
-
 pub struct ThreadMeta<'a, A: Allocator> {
     last_addr: usize,
-    pub(crate) addr2ameta: HashMap<usize, AddrMeta, DefaultHashBuilder, &'a A>,
+    addr2ameta: HashMap<usize, AddrMeta, DefaultHashBuilder, &'a A>,
 }
 
 impl<'a, A: Allocator> ThreadMeta<'a, A> {
