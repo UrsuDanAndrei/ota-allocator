@@ -7,14 +7,11 @@ mod commons;
 
 extern crate alloc;
 
-use alloc::{boxed::Box, vec::Vec};
-
 #[test]
 fn simple_box_allocation() {
     commons::init_test();
 
-    let x = Box::new(2);
-    assert_eq!(*x, 2);
+    commons::simple_box_allocation();
 
     commons::end_test();
 }
@@ -23,14 +20,7 @@ fn simple_box_allocation() {
 fn multiple_boxes_allocation() {
     commons::init_test();
 
-    let x = Box::new(2);
-    assert_eq!(*x, 2);
-
-    let y = Box::new(3);
-    assert_eq!(*y, 3);
-
-    let z = Box::new(4);
-    assert_eq!(*z, 4);
+    commons::multiple_boxes_allocation();
 
     commons::end_test();
 }
@@ -39,20 +29,7 @@ fn multiple_boxes_allocation() {
 fn intertwined_box_allocation() {
     commons::init_test();
 
-    let x = Box::new(2);
-    let y = Box::new(3);
-
-    assert_eq!(*x, 2);
-    assert_eq!(*y, 3);
-
-    let z = Box::new(4);
-
-    {
-        let u = Box::new(5);
-        assert_eq!(*u, 5);
-    }
-
-    assert_eq!(*z, 4);
+    commons::intertwined_box_allocation();
 
     commons::end_test();
 }
@@ -61,16 +38,22 @@ fn intertwined_box_allocation() {
 fn vec_allocation() {
     commons::init_test();
 
-    let mut v = Vec::new();
-    let max_size = 2;
-
-    for i in 0..max_size {
-        v.push(2 * i);
-    }
-
-    assert_eq!(v.iter().sum::<usize>(), max_size * (max_size - 1));
+    commons::vec_allocation(256);
 
     commons::end_test();
 }
 
+#[test]
+fn mixed_allocation() {
+    commons::init_test();
 
+    commons::vec_allocation(2);
+    commons::intertwined_box_allocation();
+    commons::vec_allocation(128);
+    commons::simple_box_allocation();
+    commons::simple_box_allocation();
+    commons::vec_allocation(64);
+    commons::intertwined_box_allocation();
+
+    commons::end_test();
+}

@@ -1,4 +1,8 @@
 mod alloc_test_wrapper;
+mod test_scenarios;
+
+// reexport
+pub use test_scenarios::*;
 
 use alloc_test_wrapper::AllocTestWrapper;
 
