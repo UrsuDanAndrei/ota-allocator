@@ -7,11 +7,11 @@ use hashbrown::hash_map::DefaultHashBuilder;
 // reexports
 pub use allocator_wrapper::AllocatorWrapper;
 
-use thread_meta::ThreadMeta;
 use crate::consts;
 use crate::utils::get_addr_space;
 use hashbrown::HashMap;
 use spin::Mutex;
+use thread_meta::ThreadMeta;
 
 pub struct Metadata<'a, A: Allocator> {
     next_addr_space: usize,

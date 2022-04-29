@@ -1,9 +1,9 @@
 mod addr_meta;
 
-use addr_meta::AddrMeta;
 use crate::consts;
-use crate::utils::mman_wrapper;
 use crate::utils;
+use crate::utils::mman_wrapper;
+use addr_meta::AddrMeta;
 use core::alloc::{Allocator, Layout};
 use core::cmp;
 use hashbrown::hash_map::DefaultHashBuilder;
