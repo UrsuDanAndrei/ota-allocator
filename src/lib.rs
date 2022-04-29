@@ -1,163 +1,105 @@
+#![feature(allocator_api)]
+#![feature(nonnull_slice_from_raw_parts)]
+#![feature(core_panic)]
 #![no_std]
 
 mod metadata;
-mod mman_wrapper;
 mod utils;
 
-use buddy_system_allocator::LockedHeap;
+// reexports
+pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
+
+#[cfg(feature = "integration-test")]
+pub use consts::{TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START};
+
+#[cfg(feature = "integration-test")]
+pub use utils::mman_wrapper;
+
 use core::alloc::{GlobalAlloc, Layout};
-use core::cell::RefCell;
 use core::mem;
-use core::sync::atomic::AtomicUsize;
-use core::sync::atomic::Ordering;
-use hashbrown::HashMap;
 use libc_print::std_name::*;
-use metadata::{AddrMeta, Metadata, ThreadMeta};
-use spin::RwLock;
+use metadata::{AllocatorWrapper, Metadata};
+use spin::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use utils::consts;
 
-pub struct OtaAllocator {
-    use_meta_allocator: AtomicUsize,
-    meta: RwLock<Metadata>,
-
-    // FIXME, figure out the proper ORDER value here, using 16 for now
-    meta_alloc: LockedHeap<{ consts::BUDDY_ALLOCATOR_ORDER }>,
+pub struct OtaAllocator<'a, GA: GlobalAlloc> {
+    // TODO find a way out of using Option here, this is the only thing that makes use of
+    //  the init method, it would be great if we could get rid of it
+    //
+    // we need option here because HashMap::new can't be called from a constant function
+    meta: Option<RwLock<Metadata<'a, AllocatorWrapper<GA>>>>,
+    meta_alloc: AllocatorWrapper<GA>,
 }
 
-impl OtaAllocator {
-    pub const fn new() -> Self {
+impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
+    pub const fn new_in(meta_alloc: GA) -> Self {
         OtaAllocator {
-            use_meta_allocator: AtomicUsize::new(0),
-            meta: RwLock::new(Metadata::new()),
-            meta_alloc: LockedHeap::new(),
+            meta: None,
+            meta_alloc: AllocatorWrapper::new(meta_alloc),
         }
     }
 
     // this function must be called EXACTLY once before using the allocator
-    pub fn init(&mut self) {
-        self.meta.write().init();
+    pub fn init(&'a mut self) {
+        self.meta = Some(RwLock::new(Metadata::new_in(
+            consts::FIRST_ADDR_SPACE_START,
+            &self.meta_alloc,
+        )));
+    }
 
-        unsafe {
-            if let Err(err) =
-                mman_wrapper::mmap(consts::META_ADDR_SPACE as *mut u8, consts::META_SPACE_SIZE)
-            {
-                eprintln!(
-                    "Error with code: {}, when calling mmap for allocating heap memory!",
-                    err
-                );
-                panic!("");
-            }
+    pub fn meta_alloc(&self) -> &GA {
+        self.meta_alloc.wrapped_allocator()
+    }
 
-            self.meta_alloc
-                .lock()
-                .init(consts::META_ADDR_SPACE, consts::META_SPACE_SIZE);
-        }
+    fn read_meta(&self) -> RwLockReadGuard<Metadata<'a, AllocatorWrapper<GA>>> {
+        self.meta.as_ref().unwrap().read()
+    }
+
+    fn write_meta(&self) -> RwLockWriteGuard<Metadata<'a, AllocatorWrapper<GA>>> {
+        // getting the write lock trough an upgradeable read lock to avoid write starvation
+        self.meta.as_ref().unwrap().upgradeable_read().upgrade()
     }
 }
 
-unsafe impl GlobalAlloc for OtaAllocator {
+unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let tid = utils::get_current_tid();
+        let mut read_meta = self.read_meta();
 
-        if self
-            .use_meta_allocator
-            .compare_exchange(tid, tid, Ordering::Relaxed, Ordering::Relaxed)
-            .is_ok()
-        {
-            return self.meta_alloc.alloc(layout);
-        }
-
-        let mut rlocked_meta = self.meta.read();
-
-        let tmeta = match rlocked_meta.get_tmeta_for_tid(tid) {
+        let tmeta = match read_meta.get_tmeta(tid) {
             None => {
                 // dropping the read lock earlier, so we can get the write lock
-                mem::drop(rlocked_meta);
+                mem::drop(read_meta);
 
-                // getting the write lock trough an upgradeable read lock to avoid write starvation
-                let mut wlocked_meta = self.meta.upgradeable_read().upgrade();
-
-                self.use_meta_allocator.store(tid, Ordering::Relaxed);
-                wlocked_meta.add_new_thread(tid);
-                self.use_meta_allocator.store(0, Ordering::Relaxed);
+                let mut write_meta = self.write_meta();
+                write_meta.add_new_thread(tid);
 
                 // dropping the write lock earlier, to release waiting reading threads
-                mem::drop(wlocked_meta);
+                mem::drop(write_meta);
 
                 // regaining the read lock
-                rlocked_meta = self.meta.read();
-
-                rlocked_meta.get_tmeta_for_tid(tid).unwrap()
+                read_meta = self.read_meta();
+                read_meta.get_tmeta(tid).unwrap()
             }
 
             Some(tmeta) => tmeta,
         };
 
-        if *tmeta.use_meta_alloc.borrow() {
-            return self.meta_alloc.alloc(layout);
-        }
-
-        // this call isn't protected by a lock, because it only reads/writes thread local data
-        let next_addr = tmeta.next_addr(layout);
-
-        // start of the critical region protected by addr2meta lock
-        let mut locked_addr2meta = tmeta.addr2meta.lock();
-
-        let addr2meta = locked_addr2meta.get_or_insert(HashMap::new());
-
-        // insert might trigger a call for alloc and dealloc, handled by the meta allocator
-        *tmeta.use_meta_alloc.borrow_mut() = true;
-        addr2meta.insert(next_addr, AddrMeta::new(2));
-        *tmeta.use_meta_alloc.borrow_mut() = false;
-
-        next_addr
+        let addr = tmeta.lock().next_addr(layout);
+        addr as *mut u8
     }
 
-    unsafe fn dealloc(&self, ptr: *mut u8, layout: Layout) {
-        let tid = utils::get_current_tid();
+    unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
+        let addr = ptr as usize;
+        let read_meta = self.read_meta();
 
-        if self
-            .use_meta_allocator
-            .compare_exchange(tid, tid, Ordering::Relaxed, Ordering::Relaxed)
-            .is_ok()
-        {
-            self.meta_alloc.dealloc(ptr, layout);
-        }
-
-        let rlocked_meta = self.meta.read();
-        let tmeta = rlocked_meta.get_tmeta_for_tid(tid).unwrap();
-
-        if utils::is_meta_addr(ptr) {
-            if *tmeta.use_meta_alloc.borrow() {
-                self.meta_alloc.dealloc(ptr, layout);
-                return;
-            } else {
-                eprintln!("Invalid metadata free attempt! This might be a security issue!");
+        match read_meta.get_addr_tmeta(addr) {
+            None => {
+                eprintln!("Invalid or double free!");
                 panic!("");
             }
-        }
 
-        // the metadata of the thread that allocated this address (might be different from tid)
-        // let alloc_tid =
-        let alloc_tmeta = rlocked_meta.get_tmeta_for_addr(ptr as usize).unwrap();
-
-        // TODO maybe move this someplace else, like we did with next_addr method
-        //  make the call to munmap, and find the size of the memory, don't use layout.size()
-        //  since it is not compatible with the c free api
-        if let Err(err) = mman_wrapper::munmap(ptr, layout.size()) {
-            eprintln!("Error with code: {}, when calling unmap!", err);
-            panic!("");
-        }
-
-        // start of the critical region protected by addr2meta lock
-        let mut locked_addr2meta = alloc_tmeta.addr2meta.lock();
-
-        // TODO handle the None case
-        let addr2meta = locked_addr2meta.as_mut().unwrap();
-
-        // remove might trigger a call for alloc and dealloc, handled by the meta allocator
-        *tmeta.use_meta_alloc.borrow_mut() = true;
-        addr2meta.remove(&ptr);
-        *tmeta.use_meta_alloc.borrow_mut() = false;
+            Some(addr_tmeta) => addr_tmeta.lock().free_addr(addr),
+        };
     }
 }

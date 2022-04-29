@@ -1,89 +1,59 @@
 #![no_std]
-
-#![feature(const_fn_trait_bound)]
-#![feature(custom_test_frameworks)]
-#![test_runner(test_runner)]
+#![feature(default_alloc_error_handler)]
+#![feature(core_panic)]
+#![feature(allocator_api)]
 
 mod commons;
 
 extern crate alloc;
 
-use commons::AllocatorTestWrapper;
-use ota_allocator::OtaAllocator;
-use alloc::{boxed::Box, vec::Vec};
-use libc_print::std_name::*;
-
-#[global_allocator]
-static mut ALLOCATOR: AllocatorTestWrapper<OtaAllocator> =
-    AllocatorTestWrapper::new(OtaAllocator::new());
-
-pub fn test_runner(tests: &[&dyn Fn()]) {
-    unsafe {
-        ALLOCATOR.allocator.init();
-        commons::test_runner(tests, &mut ALLOCATOR);
-    }
-}
-
-#[test_case]
+#[test]
 fn simple_box_allocation() {
-    print!("testing simple_box_allocation... ");
+    commons::init_test();
 
-    let x = Box::new(2);
-    assert_eq!(*x, 2);
+    commons::simple_box_allocation();
 
-    println!("OK");
+    commons::end_test();
 }
 
-#[test_case]
+#[test]
 fn multiple_boxes_allocation() {
-    print!("testing multiple_boxes_allocation... ");
+    commons::init_test();
 
-    let x = Box::new(2);
-    assert_eq!(*x, 2);
+    commons::multiple_boxes_allocation();
 
-    let y = Box::new(3);
-    assert_eq!(*y, 3);
-
-    let z = Box::new(4);
-    assert_eq!(*z, 4);
-
-    println!("OK");
+    commons::end_test();
 }
 
-#[test_case]
+#[test]
 fn intertwined_box_allocation() {
-    print!("testing intertwined_box_allocation... ");
+    commons::init_test();
 
-    let x = Box::new(2);
-    let y = Box::new(3);
+    commons::intertwined_box_allocation();
 
-    assert_eq!(*x, 2);
-    assert_eq!(*y, 3);
-
-    let z = Box::new(4);
-
-    {
-        let u = Box::new(5);
-        assert_eq!(*u, 5);
-    }
-
-    assert_eq!(*z, 4);
-
-    println!("OK");
+    commons::end_test();
 }
 
-#[test_case]
+#[test]
 fn vec_allocation() {
-    print!("testing vec_allocation... ");
+    commons::init_test();
 
-    let mut v = Vec::new();
-    let max_size = 256;
+    commons::vec_allocation(256);
 
-    for i in 0..max_size {
-        v.push(2 * i);
-    }
+    commons::end_test();
+}
 
-    assert_eq!(v.iter().sum::<usize>(), max_size * (max_size - 1));
+#[test]
+fn mixed_allocation() {
+    commons::init_test();
 
-    println!("OK");
+    commons::vec_allocation(2);
+    commons::intertwined_box_allocation();
+    commons::vec_allocation(128);
+    commons::simple_box_allocation();
+    commons::simple_box_allocation();
+    commons::vec_allocation(64);
+    commons::intertwined_box_allocation();
+
+    commons::end_test();
 }

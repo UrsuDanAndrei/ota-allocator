@@ -1,17 +1,23 @@
-pub mod allocator_test_wrapper;
+mod alloc_test_wrapper;
+mod test_scenarios;
 
-// reexports
-pub use allocator_test_wrapper::AllocatorTestWrapper;
+// reexport
+pub use test_scenarios::*;
 
-use core::alloc::GlobalAlloc;
-use libc_print::std_name::*;
+use alloc_test_wrapper::AllocTestWrapper;
 
-pub fn test_runner<T: GlobalAlloc>(tests: &[&dyn Fn()], allocator: &mut AllocatorTestWrapper<T>) {
-    println!("\nRunning {} tests...\n", tests.len());
-    for test in tests {
-        allocator.use_wrapped_allocator = true;
-        test();
-        allocator.use_wrapped_allocator = false;
+#[global_allocator]
+static mut ALLOCATOR: AllocTestWrapper = AllocTestWrapper::new();
+
+pub fn init_test() {
+    unsafe {
+        ALLOCATOR.try_init();
+        ALLOCATOR.use_ota_allocator();
     }
-    println!();
+}
+
+pub fn end_test() {
+    unsafe {
+        ALLOCATOR.use_cargo_allocator();
+    }
 }

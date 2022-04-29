@@ -1,56 +1,57 @@
-pub mod addr_meta;
-pub mod thread_meta;
+mod allocator_wrapper;
+mod thread_meta;
+
+use core::alloc::Allocator;
+use hashbrown::hash_map::DefaultHashBuilder;
 
 // reexports
-pub use addr_meta::AddrMeta;
-pub use thread_meta::ThreadMeta;
+pub use allocator_wrapper::AllocatorWrapper;
 
-use hashbrown::HashMap;
 use crate::consts;
+use crate::utils::get_addr_space;
+use hashbrown::HashMap;
+use spin::Mutex;
+use thread_meta::ThreadMeta;
 
-pub struct Metadata {
+pub struct Metadata<'a, A: Allocator> {
     next_addr_space: usize,
-
-    // TODO make your own wrapper or find a better one instead of using Option
-    //  we need option here because HashMap::new can't be called from a constant function
-    addr2tid: Option<HashMap<usize, usize>>,
-
-    tid2tmeta: Option<HashMap<usize, ThreadMeta>>,
+    addr2tid: HashMap<usize, usize, DefaultHashBuilder, &'a A>,
+    tid2tmeta: HashMap<usize, Mutex<ThreadMeta<'a, A>>, DefaultHashBuilder, &'a A>,
 }
 
-impl Metadata {
-    pub const fn new() -> Self {
+impl<'a, A: Allocator> Metadata<'a, A> {
+    pub fn new_in(first_addr_space: usize, meta_alloc: &'a A) -> Self {
         Metadata {
-            next_addr_space: consts::FIRST_ADDR_SPACE,
-            addr2tid: None,
-            tid2tmeta: None
+            next_addr_space: first_addr_space,
+            addr2tid: HashMap::with_capacity_in(consts::RESV_THREADS_NO, meta_alloc),
+            tid2tmeta: HashMap::with_capacity_in(consts::RESV_THREADS_NO, meta_alloc),
         }
-    }
-
-    pub fn init(&mut self) {
-        self.addr2tid = Some(HashMap::new());
-        self.tid2tmeta = Some(HashMap::new());
     }
 
     pub fn add_new_thread(&mut self, tid: usize) {
         // new thread => new associated ThreadMeta structure
-        let tid2meta = self.tid2tmeta.as_mut().unwrap();
-        tid2meta.insert(tid, ThreadMeta::new(self.next_addr_space));
+        self.tid2tmeta.insert(
+            tid,
+            Mutex::new(ThreadMeta::new_in(
+                self.next_addr_space,
+                *self.tid2tmeta.allocator(),
+            )),
+        );
 
         // new thread => new address space
-        self.next_addr_space -= consts::ADDR_SPACE_SIZE;
+        self.next_addr_space -= consts::ADDR_SPACE_MAX_SIZE;
 
-        // new mapping: new address space -> new thread
-        let addr2tid = self.addr2tid.as_mut().unwrap();
-        addr2tid.insert(self.next_addr_space, tid);
+        // new thread => new (address space -> thread) mapping
+        self.addr2tid.insert(self.next_addr_space, tid);
     }
 
-    pub fn get_tmeta_for_tid(&self, tid: usize) -> Option<&ThreadMeta> {
-        self.tid2tmeta.as_ref().unwrap().get(&tid)
+    pub fn get_tmeta(&self, tid: usize) -> Option<&Mutex<ThreadMeta<'a, A>>> {
+        self.tid2tmeta.get(&tid)
     }
 
-    pub fn get_tmeta_for_addr(&self, addr: usize) -> Option<&ThreadMeta> {
-        let tid = *self.addr2tid.as_ref().unwrap().get(&(addr & consts::ADDR_SPACE_MASK)).unwrap();
-        self.get_tmeta_for_tid(tid)
+    pub fn get_addr_tmeta(&self, addr: usize) -> Option<&Mutex<ThreadMeta<'a, A>>> {
+        self.addr2tid
+            .get(&get_addr_space(addr))
+            .and_then(|tid| self.get_tmeta(*tid))
     }
 }
