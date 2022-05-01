@@ -1,5 +1,6 @@
 pub mod consts;
 pub mod mman_wrapper;
+pub mod rc_alloc;
 
 #[inline(always)]
 pub fn get_addr_space(addr: usize) -> usize {
@@ -14,4 +15,9 @@ pub fn get_current_tid() -> usize {
 #[inline(always)]
 pub fn align_down(addr: usize, align: usize) -> usize {
     addr & !(align - 1)
+}
+
+#[inline(always)]
+pub fn align_up(addr: usize, align: usize) -> usize {
+    (addr + align - 1) & !(align - 1)
 }

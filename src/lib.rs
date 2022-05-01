@@ -3,6 +3,8 @@
 #![feature(core_panic)]
 #![no_std]
 
+extern crate alloc;
+
 mod metadata;
 mod utils;
 
@@ -17,11 +19,28 @@ pub use utils::mman_wrapper;
 
 use core::alloc::{GlobalAlloc, Layout};
 use core::mem;
+use libc_print::{libc_print, libc_println};
 use libc_print::std_name::*;
 use metadata::{AllocatorWrapper, Metadata};
 use spin::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use utils::consts;
 
+// TODO as you are able to pass a reference to Box::new_in and HashMap::new_in instead of the
+//  actual allocator, maybe you can also try to require your GA to be Clone as well and call
+//  OtaAllocator::new_in with a reference instead of the actual value.
+//  -
+//  This would eliminate the need for lifetimes, so the code will be simpler and various lifetime
+//  restrictions, such as the one we had with Once::call_once might be mitigated
+//  -
+//  Sample code for this usage:
+//  -
+//  static META_ALLOC = LockedHeap::new();
+//  static ALLOCATOR = OtaAllocator::new_in(&META_ALLOC)
+//  -
+//  the 2 lines can be hidden behind a macro:
+//  -
+//  define_ota_allocator!(ALLOCATOR, LockedHeap::new());
+//  -
 pub struct OtaAllocator<'a, GA: GlobalAlloc> {
     // TODO find a way out of using Option here, this is the only thing that makes use of
     //  the init method, it would be great if we could get rid of it
@@ -62,6 +81,8 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
 }
 
 unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
+    // TODO you can only use layout.size(), this function should be the only one that receives
+    //  layout, others should only receive size
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
         let tid = utils::get_current_tid();
         let mut read_meta = self.read_meta();

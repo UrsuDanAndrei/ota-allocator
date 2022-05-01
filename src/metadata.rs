@@ -10,6 +10,7 @@ pub use allocator_wrapper::AllocatorWrapper;
 use crate::consts;
 use crate::utils::get_addr_space;
 use hashbrown::HashMap;
+use libc_print::libc_eprint;
 use spin::Mutex;
 use thread_meta::ThreadMeta;
 
@@ -29,6 +30,10 @@ impl<'a, A: Allocator> Metadata<'a, A> {
     }
 
     pub fn add_new_thread(&mut self, tid: usize) {
+        // TODO make this increasing too
+        // new thread => new address space
+        self.next_addr_space -= consts::ADDR_SPACE_MAX_SIZE;
+
         // new thread => new associated ThreadMeta structure
         self.tid2tmeta.insert(
             tid,
@@ -37,9 +42,6 @@ impl<'a, A: Allocator> Metadata<'a, A> {
                 *self.tid2tmeta.allocator(),
             )),
         );
-
-        // new thread => new address space
-        self.next_addr_space -= consts::ADDR_SPACE_MAX_SIZE;
 
         // new thread => new (address space -> thread) mapping
         self.addr2tid.insert(self.next_addr_space, tid);
