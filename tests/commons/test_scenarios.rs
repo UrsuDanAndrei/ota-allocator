@@ -42,3 +42,31 @@ pub fn vec_allocation(max_size: usize) {
 
     assert_eq!(v.iter().sum::<usize>(), max_size * (max_size - 1));
 }
+
+pub fn many_small_allocations() {
+    let to_box = (2_u64, 2_u64);
+
+    // consume the first pool
+    for _ in 0..(ota_allocator::POOL_SIZE / 16 + 1) {
+        let _ = Box::new(to_box);
+    }
+
+    // consume multiple pools
+    for _ in 0..4 {
+        for _ in 0..(ota_allocator::POOL_SIZE / 16 + 1) {
+            let _ = Box::new(to_box);
+        }
+    }
+
+    // trigger a second mmap call
+    for _ in 0..(ota_allocator::MAPPED_MEMORY_EXTENSION_SIZE / 16 + 1) {
+        let _ = Box::new(to_box);
+    }
+
+    // trigger multiple mmap calls
+    for _ in 0..4 {
+        for _ in 0..(ota_allocator::MAPPED_MEMORY_EXTENSION_SIZE / 16) {
+            let _ = Box::new(to_box);
+        }
+    }
+}

@@ -2,24 +2,21 @@ mod addr_meta;
 mod pool_allocator;
 
 use crate::consts;
-use crate::utils;
+use crate::metadata::thread_meta::pool_allocator::{Pool, PoolAllocator};
 use crate::utils::mman_wrapper;
+use crate::utils::rc_alloc::RcAlloc;
 use addr_meta::AddrMeta;
-use core::alloc::{Allocator, Layout};
+use core::alloc::Allocator;
 use core::cell::RefCell;
-use core::cmp;
 use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
-use libc_print::{libc_print, libc_println};
-use libc_print::std_name::*;
-use crate::metadata::thread_meta::pool_allocator::{Pool, PoolAllocator};
-use crate::utils::rc_alloc::RcAlloc;
+use libc_print::std_name::eprintln;
 
 pub struct ThreadMeta<'a, A: Allocator> {
     addr2ameta: HashMap<usize, AddrMeta<'a, A>, DefaultHashBuilder, &'a A>,
-    // TODO see if you can get rid of RefCell here
     pool: RcAlloc<RefCell<Pool>, &'a A>,
-    pool_alloc: PoolAllocator
+    pool_alloc: PoolAllocator,
+    i: usize,
 }
 
 impl<'a, A: Allocator> ThreadMeta<'a, A> {
@@ -30,37 +27,33 @@ impl<'a, A: Allocator> ThreadMeta<'a, A> {
         ThreadMeta {
             addr2ameta: HashMap::with_capacity_in(consts::RESV_ADDRS_NO, allocator),
             pool: RcAlloc::new_in(RefCell::new(current_pool), allocator),
-            pool_alloc
+            pool_alloc,
+            i: 0,
         }
     }
 
-    // TODO it is weird that metadata returns data, maybe you should update the design a bit
-    pub fn next_addr(&mut self, layout: Layout) -> usize {
-        let size = layout.size();
-
+    pub fn next_addr(&mut self, size: usize) -> usize {
         // TODO change this when implementing big allocation management
         if size > consts::POOL_SIZE {
             return self.pool_alloc.next_region(size);
         }
 
-        // TODO please don't leave it like this with x ...
-        let x = self.pool.borrow_mut().alloc(size);
-
-        let (addr, addr_meta) = match x {
-            Ok(addr) => {
-                // FIXME this might be a problem if borrow_mut is not dropped
-                (addr, AddrMeta::new_single_pool(size, self.pool.clone()))
-            }
+        let addr = self.pool.borrow_mut().next_addr(size);
+        self.i += 1;
+        let (addr, addr_meta) = match addr {
+            Ok(addr) => (addr, AddrMeta::new_single_pool(size, self.pool.clone())),
 
             Err(alloc_err) => {
-                let new_pool = RcAlloc::new_in(RefCell::new(self.pool_alloc.next_pool()), *self.addr2ameta.allocator());
+                let new_pool = RcAlloc::new_in(
+                    RefCell::new(self.pool_alloc.next_pool()),
+                    *self.addr2ameta.allocator(),
+                );
 
                 let addr_meta = if alloc_err.allocated != 0 {
                     AddrMeta::new_double_pool(size, self.pool.clone(), new_pool.clone())
                 } else {
                     AddrMeta::new_single_pool(size, new_pool.clone())
                 };
-
 
                 self.pool = new_pool;
 

@@ -15,14 +15,11 @@ pub unsafe fn mmap(addr: usize, size: usize) -> Result<(), i32> {
     if mmap_addr == !0 as *mut libc::c_void {
         Err(errno_no_std::errno().0)
     } else {
-        // TODO, research if this assert is really necessary
-        //  assert_eq!(mmap_addr, addr);
         Ok(())
     }
 }
 
 pub unsafe fn munmap(addr: usize, size: usize) -> Result<(), i32> {
-    // TODO maybe assert if addr is page aligned
     let err = libc::munmap(addr as *mut libc::c_void, size);
     if err == -1 {
         Err(errno_no_std::errno().0)

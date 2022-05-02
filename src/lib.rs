@@ -12,14 +12,15 @@ mod utils;
 pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
 
 #[cfg(feature = "integration-test")]
-pub use consts::{TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START};
+pub use consts::{
+    MAPPED_MEMORY_EXTENSION_SIZE, POOL_SIZE, TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START,
+};
 
 #[cfg(feature = "integration-test")]
 pub use utils::mman_wrapper;
 
 use core::alloc::{GlobalAlloc, Layout};
 use core::mem;
-use libc_print::{libc_print, libc_println};
 use libc_print::std_name::*;
 use metadata::{AllocatorWrapper, Metadata};
 use spin::{RwLock, RwLockReadGuard, RwLockWriteGuard};
@@ -78,12 +79,14 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
         // getting the write lock trough an upgradeable read lock to avoid write starvation
         self.meta.as_ref().unwrap().upgradeable_read().upgrade()
     }
+
+    // TODO do a reset method, that brings the frees all memory and brings the allocator in the
+    //  state is was right before init for testing purposes
 }
 
 unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
-    // TODO you can only use layout.size(), this function should be the only one that receives
-    //  layout, others should only receive size
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        let size = layout.size();
         let tid = utils::get_current_tid();
         let mut read_meta = self.read_meta();
 
@@ -106,7 +109,7 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
             Some(tmeta) => tmeta,
         };
 
-        let addr = tmeta.lock().next_addr(layout);
+        let addr = tmeta.lock().next_addr(size);
         addr as *mut u8
     }
 

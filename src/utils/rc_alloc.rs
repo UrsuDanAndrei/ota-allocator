@@ -10,8 +10,8 @@ use alloc::boxed::Box;
 use core::alloc::Allocator;
 use core::cell::Cell;
 use core::marker::PhantomData;
-use core::ptr::NonNull;
 use core::ops::Deref;
+use core::ptr::NonNull;
 
 struct RcAllocInner<T, A: Allocator + Clone> {
     value: T,
@@ -22,7 +22,6 @@ struct RcAllocInner<T, A: Allocator + Clone> {
 pub struct RcAlloc<T, A: Allocator + Clone> {
     inner: NonNull<RcAllocInner<T, A>>,
     _marker: PhantomData<RcAllocInner<T, A>>,
-    // TODO maybe make a marker for A too
 }
 
 impl<T, A: Allocator + Clone> RcAlloc<T, A> {

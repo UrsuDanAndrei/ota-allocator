@@ -2,22 +2,23 @@ mod pool;
 
 use core::cmp;
 use libc_print::std_name::eprintln;
+
 // reexport
 pub use pool::Pool;
 
-use crate::{consts, utils::mman_wrapper, utils};
+use crate::{consts, utils, utils::mman_wrapper};
 
-// TODO maybe make POOL_SIZE MAPPED_MEMORY_EXTENSION_SIZE const type parameters
+// TODO maybe make POOL_SIZE and MAPPED_MEMORY_EXTENSION_SIZE const type parameters
 pub struct PoolAllocator {
     last_mapped_addr: usize, // open endpoint
-    next_pool_addr: usize
+    next_pool_addr: usize,
 }
 
 impl PoolAllocator {
     pub fn new(first_pool_addr: usize) -> Self {
         PoolAllocator {
             next_pool_addr: first_pool_addr,
-            last_mapped_addr: first_pool_addr
+            last_mapped_addr: first_pool_addr,
         }
     }
 
