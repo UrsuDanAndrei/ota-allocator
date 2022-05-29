@@ -1,6 +1,7 @@
 mod addr_meta;
 mod bin;
 mod pool_allocator;
+mod small_alloc;
 
 use crate::consts;
 use crate::metadata::thread_meta::pool_allocator::{Pool, PoolAllocator};
@@ -13,62 +14,35 @@ use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
 use libc_print::std_name::eprintln;
 use crate::metadata::thread_meta::bin::Bin;
-use arr_macro::arr;
+use arr_macro;
 use crate::consts::BINS_NO;
+use crate::metadata::thread_meta::small_alloc::SmallAlloc;
 
 pub struct ThreadMeta<'a, A: Allocator> {
     addr2ameta: HashMap<usize, AddrMeta<'a, A>, DefaultHashBuilder, &'a A>,
-    pool_alloc: PoolAllocator,
-    bins: [Bin<'a, A>; consts::BINS_NO]
+    small_alloc: SmallAlloc<'a, A>
 }
 
 impl<'a, A: Allocator> ThreadMeta<'a, A> {
-    pub fn new_in(first_addr: usize, allocator: &'a A) -> Self {
-        let mut pool_alloc = PoolAllocator::new(first_addr);
-        let mut size = consts::STANDARD_ALIGN / 2;
-
-        // this is for assuring consistency, arr! only accepts a literal
-        assert_eq!(consts::BINS_NO, 10);
-
+    pub fn new_in(first_addr: usize, meta_alloc: &'a A) -> Self {
         ThreadMeta {
-            addr2ameta: HashMap::with_capacity_in(consts::RESV_ADDRS_NO, allocator),
-            bins: arr![
-                Bin::new(
-                    { size <<= 1; size },
-                    RcAlloc::new_in(
-                        RefCell::new(pool_alloc.next_pool()),
-                        allocator
-                    )
-                );
-                10
-            ],
-            pool_alloc,
+            addr2ameta: HashMap::with_capacity_in(consts::RESV_ADDRS_NO, meta_alloc),
+            small_alloc: SmallAlloc::new_in(first_addr, meta_alloc)
         }
     }
 
     pub fn next_addr(&mut self, size: usize) -> usize {
         // TODO change this when implementing big allocation management
         if size > consts::POOL_SIZE {
-            return self.pool_alloc.next_region(size);
+            0x00000000
+        } else {
+            let (addr, addr_meta) = self.small_alloc.next_addr(size);
+
+            self.addr2ameta
+                .insert(addr, addr_meta);
+
+            addr
         }
-
-        let bin_index = self.size2bin_index(size);
-        let bin = &mut self.bins[bin_index];
-
-        let addr = bin.pool.borrow_mut().next_addr(size);
-        let addr = addr.unwrap_or_else(|| {
-            bin.pool = RcAlloc::new_in(
-                RefCell::new(self.pool_alloc.next_pool()),
-                *self.addr2ameta.allocator(),
-            );
-
-            bin.pool.borrow_mut().next_addr(size).unwrap()
-        });
-
-        self.addr2ameta
-            .insert(addr, AddrMeta::new(size, bin.pool.clone()));
-
-        addr
     }
 
     pub fn free_addr(&mut self, addr: usize) {
@@ -84,16 +58,5 @@ impl<'a, A: Allocator> ThreadMeta<'a, A> {
         }
 
         self.addr2ameta.remove(&addr);
-    }
-
-    // TODO optimise this
-    fn size2bin_index(&self, size: usize) -> usize {
-        if size <= consts::STANDARD_ALIGN {
-            0
-        } else if size >= consts::PAGE_SIZE {
-            consts::BINS_NO - 1
-        } else {
-            (size.next_power_of_two().trailing_zeros() - 4) as usize
-        }
     }
 }
