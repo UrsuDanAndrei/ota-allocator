@@ -57,3 +57,12 @@ fn mixed_allocation() {
 
     commons::end_test();
 }
+
+#[test]
+fn many_small_allocations() {
+    commons::init_test();
+
+    commons::many_small_allocations();
+
+    commons::end_test();
+}

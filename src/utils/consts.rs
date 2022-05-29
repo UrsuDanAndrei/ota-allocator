@@ -4,27 +4,45 @@ pub const RESV_THREADS_NO: usize = 0;
 // TODO figure out the proper value to use here
 pub const RESV_ADDRS_NO: usize = 0;
 
-// TODO make this configurable
+// TODO make take this from the OS
 pub const PAGE_SIZE: usize = 4096;
 
 // TODO manage address spaces
-pub const FIRST_ADDR_SPACE_START: usize = 0x0000_7FFD_0000_0000;
-pub const ADDR_SPACE_MAX_SIZE: usize = 0x0000_0001_0000_0000;
-pub const ADDR_SPACE_MASK: usize = 0xFFFF_FFFF_0000_0000;
+// 0x0000_0000_0000_0000
+// 64 bits for memory addressing, only 48 bits can be currently used,
+// only addresses from 0x0000_0000_0000_0000 to 0x0000_7FFF_FFFF_FFFF are valid, so we can use only
+// use 47 bits from 64 for addressing
+//
+// current design:
+// - I chose to use addresses from 0x0000_0010_0000_0000 to 0x0000_7FFF_FFFF_FFFF
+// - each address space has a size of 2 ^ 36 (64 GB), so we have a 11 bits left for identifying the
+//   address space itself => a maximum of 2047 address spaces (we don't use address space 0)
+// - address space 0x001 is used for testing purposes
+// - address space 0x002 is used for metadata store
+// - each thread that allocates memory is assign an address spaces from 0x003 to 0x7FF
+//
+// limitations:
+// - a thread can only allocate a maximum of 64GB of memory (even if it frees it)
+// - there can be only a maximum of 2045 threads that allocate memory
+// - the 2 limitations above directly influence each other, if one improves the other worsens
+// - TODO find the sweet spot to use as default, but give the user the option to adjust
+//
+pub const FIRST_ADDR_SPACE_START: usize = 0x0000_0030_0000_0000;
+pub const ADDR_SPACE_MAX_SIZE: usize = 0x0000_0010_0000_0000;
+pub const ADDR_SPACE_MASK: usize = 0xFFFF_FFF0_0000_0000;
 
-pub const META_ADDR_SPACE_START: usize = 0x0000_7FFE_0000_0000;
+pub const META_ADDR_SPACE_START: usize = 0x0000_0020_0000_0000;
 pub const META_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
 
+// TODO make this values configurable from the user
+pub const POOL_SIZE: usize = 8 * PAGE_SIZE;
+pub const MAPPED_MEMORY_EXTENSION_SIZE: usize = 4 * POOL_SIZE;
+
+// TODO research how to do custom alignment per allocation instead of always using this const
+pub const STANDARD_ALIGN: usize = 16;
+
 #[cfg(feature = "integration-test")]
-pub const TEST_ADDR_SPACE_START: usize = 0x0000_7FFF_0000_0000;
+pub const TEST_ADDR_SPACE_START: usize = 0x0000_0010_0000_0000;
 
 #[cfg(feature = "integration-test")]
 pub const TEST_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
-
-/*
-0 -> 0000_7FFF_FFFF_FFFF
-FFFF_8000_0000_0000 -> FFFF_FFFF_FFFF_FFFF
-
-32768 = 0x8000#![feature(core_panic)]
-65536 = 0x10000 (0xFFFF + 1)
- */

@@ -15,80 +15,61 @@ use std::thread;
 #[test]
 fn simple_box_allocation() {
     commons::init_test();
-    {
-        let t1 = thread::spawn(|| {
-            commons::simple_box_allocation();
-        });
 
-        let t2 = thread::spawn(|| {
-            commons::simple_box_allocation();
-        });
+    run_with_two_threads(
+        commons::simple_box_allocation,
+        commons::simple_box_allocation,
+    );
 
-        t1.join().unwrap();
-        t2.join().unwrap();
-    }
     commons::end_test();
 }
 
 #[test]
 fn multiple_boxes_allocation() {
     commons::init_test();
-    {
-        let t1 = thread::spawn(|| {
-            commons::multiple_boxes_allocation();
-        });
 
-        let t2 = thread::spawn(|| {
-            commons::multiple_boxes_allocation();
-        });
+    run_with_two_threads(
+        commons::multiple_boxes_allocation,
+        commons::multiple_boxes_allocation,
+    );
 
-        t1.join().unwrap();
-        t2.join().unwrap();
-    }
     commons::end_test();
 }
 
 #[test]
 fn intertwined_box_allocation() {
     commons::init_test();
-    {
-        let t1 = thread::spawn(|| {
-            commons::intertwined_box_allocation();
-        });
 
-        let t2 = thread::spawn(|| {
-            commons::intertwined_box_allocation();
-        });
+    run_with_two_threads(
+        commons::intertwined_box_allocation,
+        commons::intertwined_box_allocation,
+    );
 
-        t1.join().unwrap();
-        t2.join().unwrap();
-    }
     commons::end_test();
 }
 
 #[test]
 fn vec_allocation() {
     commons::init_test();
-    {
-        let t1 = thread::spawn(|| {
-            commons::vec_allocation(256);
-        });
 
-        let t2 = thread::spawn(|| {
+    run_with_two_threads(
+        || {
+            commons::vec_allocation(128);
+        },
+        || {
             commons::vec_allocation(256);
-        });
+        },
+    );
 
-        t1.join().unwrap();
-        t2.join().unwrap();
-    }
     commons::end_test();
 }
 
 #[test]
 fn mixed_allocation() {
     commons::init_test();
-    {
-        let t1 = thread::spawn(|| {
+
+    run_with_two_threads(
+        || {
             commons::vec_allocation(128);
             useless_compute();
             commons::intertwined_box_allocation();
@@ -98,9 +79,8 @@ fn mixed_allocation() {
             commons::simple_box_allocation();
             commons::intertwined_box_allocation();
             useless_compute();
-        });
-
-        let t2 = thread::spawn(|| {
+        },
+        || {
             commons::vec_allocation(2);
             useless_compute();
             commons::vec_allocation(32);
@@ -109,11 +89,9 @@ fn mixed_allocation() {
             commons::intertwined_box_allocation();
             useless_compute();
             commons::vec_allocation(16);
-        });
+        },
+    );
 
-        t1.join().unwrap();
-        t2.join().unwrap();
-    }
     commons::end_test();
 }
 
@@ -143,7 +121,30 @@ fn many_threads() {
     commons::end_test();
 }
 
+#[test]
+fn many_small_allocations() {
+    commons::init_test();
+
+    run_with_two_threads(
+        commons::many_small_allocations,
+        commons::many_small_allocations,
+    );
+
+    commons::end_test();
+}
+
+fn run_with_two_threads(thread1task: fn(), thread2task: fn()) {
+    let t1 = thread::spawn(move || {
+        thread1task();
+    });
+    let t2 = thread::spawn(move || {
+        thread2task();
+    });
+    t1.join().unwrap();
+    t2.join().unwrap();
+}
+
 #[inline(always)]
-pub fn useless_compute() {
+fn useless_compute() {
     (1..1_000_000).sum::<usize>();
 }

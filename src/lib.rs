@@ -3,6 +3,8 @@
 #![feature(core_panic)]
 #![no_std]
 
+extern crate alloc;
+
 mod metadata;
 mod utils;
 
@@ -10,7 +12,9 @@ mod utils;
 pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
 
 #[cfg(feature = "integration-test")]
-pub use consts::{TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START};
+pub use consts::{
+    MAPPED_MEMORY_EXTENSION_SIZE, POOL_SIZE, TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START,
+};
 
 #[cfg(feature = "integration-test")]
 pub use utils::mman_wrapper;
@@ -22,6 +26,22 @@ use metadata::{AllocatorWrapper, Metadata};
 use spin::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use utils::consts;
 
+// TODO as you are able to pass a reference to Box::new_in and HashMap::new_in instead of the
+//  actual allocator, maybe you can also try to require your GA to be Clone as well and call
+//  OtaAllocator::new_in with a reference instead of the actual value.
+//  -
+//  This would eliminate the need for lifetimes, so the code will be simpler and various lifetime
+//  restrictions, such as the one we had with Once::call_once might be mitigated
+//  -
+//  Sample code for this usage:
+//  -
+//  static META_ALLOC = LockedHeap::new();
+//  static ALLOCATOR = OtaAllocator::new_in(&META_ALLOC)
+//  -
+//  the 2 lines can be hidden behind a macro:
+//  -
+//  define_ota_allocator!(ALLOCATOR, LockedHeap::new());
+//  -
 pub struct OtaAllocator<'a, GA: GlobalAlloc> {
     // TODO find a way out of using Option here, this is the only thing that makes use of
     //  the init method, it would be great if we could get rid of it
@@ -59,10 +79,14 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
         // getting the write lock trough an upgradeable read lock to avoid write starvation
         self.meta.as_ref().unwrap().upgradeable_read().upgrade()
     }
+
+    // TODO do a reset method, that brings the frees all memory and brings the allocator in the
+    //  state is was right before init for testing purposes
 }
 
 unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        let size = layout.size();
         let tid = utils::get_current_tid();
         let mut read_meta = self.read_meta();
 
@@ -85,7 +109,7 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
             Some(tmeta) => tmeta,
         };
 
-        let addr = tmeta.lock().next_addr(layout);
+        let addr = tmeta.lock().next_addr(size);
         addr as *mut u8
     }
 

@@ -38,11 +38,11 @@ impl<'a, A: Allocator> Metadata<'a, A> {
             )),
         );
 
-        // new thread => new address space
-        self.next_addr_space -= consts::ADDR_SPACE_MAX_SIZE;
-
         // new thread => new (address space -> thread) mapping
         self.addr2tid.insert(self.next_addr_space, tid);
+
+        // new thread => new address space
+        self.next_addr_space += consts::ADDR_SPACE_MAX_SIZE;
     }
 
     pub fn get_tmeta(&self, tid: usize) -> Option<&Mutex<ThreadMeta<'a, A>>> {
