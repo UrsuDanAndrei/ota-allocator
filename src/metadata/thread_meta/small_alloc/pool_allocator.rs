@@ -1,12 +1,8 @@
-mod pool;
-
 use core::cmp;
 use libc_print::std_name::eprintln;
 
-// reexport
-pub use pool::Pool;
-
 use crate::{consts, utils, utils::mman_wrapper};
+use crate::metadata::thread_meta::small_alloc::pool::Pool;
 
 // TODO maybe make POOL_SIZE and MAPPED_MEMORY_EXTENSION_SIZE const type parameters
 pub struct PoolAllocator {

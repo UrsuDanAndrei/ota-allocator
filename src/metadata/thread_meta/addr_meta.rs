@@ -1,7 +1,7 @@
-use crate::metadata::thread_meta::pool_allocator::Pool;
 use crate::utils::rc_alloc::RcAlloc;
 use core::alloc::Allocator;
 use core::cell::RefCell;
+use crate::metadata::thread_meta::small_alloc::pool::Pool;
 
 // TODO when managing big allocation make this en enum BigAddrMeta, SmallAddrMeta
 pub struct AddrMeta<'a, A: Allocator> {

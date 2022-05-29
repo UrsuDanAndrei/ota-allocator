@@ -1,3 +1,7 @@
+mod bin;
+mod pool_allocator;
+pub mod pool;
+
 use core::alloc::Allocator;
 use core::cell::RefCell;
 use hashbrown::hash_map::DefaultHashBuilder;
@@ -5,8 +9,8 @@ use hashbrown::HashMap;
 use libc_print::std_name::eprintln;
 use crate::{consts, utils::mman_wrapper};
 use crate::metadata::thread_meta::addr_meta::AddrMeta;
-use crate::metadata::thread_meta::bin::Bin;
-use crate::metadata::thread_meta::pool_allocator::PoolAllocator;
+use crate::metadata::thread_meta::small_alloc::bin::Bin;
+use crate::metadata::thread_meta::small_alloc::pool_allocator::PoolAllocator;
 use crate::utils::rc_alloc::RcAlloc;
 
 pub struct SmallAlloc<'a, A: Allocator> {

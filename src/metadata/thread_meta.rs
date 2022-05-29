@@ -1,10 +1,7 @@
 mod addr_meta;
-mod bin;
-mod pool_allocator;
 mod small_alloc;
 
 use crate::consts;
-use crate::metadata::thread_meta::pool_allocator::{Pool, PoolAllocator};
 use crate::utils::mman_wrapper;
 use crate::utils::rc_alloc::RcAlloc;
 use addr_meta::AddrMeta;
@@ -13,7 +10,6 @@ use core::cell::RefCell;
 use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
 use libc_print::std_name::eprintln;
-use crate::metadata::thread_meta::bin::Bin;
 use arr_macro;
 use crate::consts::BINS_NO;
 use crate::metadata::thread_meta::small_alloc::SmallAlloc;

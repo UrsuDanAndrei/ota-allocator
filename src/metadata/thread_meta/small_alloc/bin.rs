@@ -1,6 +1,6 @@
 use core::alloc::Allocator;
 use core::cell::RefCell;
-use crate::metadata::thread_meta::pool_allocator::Pool;
+use crate::metadata::thread_meta::small_alloc::pool::Pool;
 use crate::utils::rc_alloc::RcAlloc;
 
 pub struct Bin<'a, A: Allocator> {
