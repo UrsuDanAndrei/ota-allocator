@@ -13,7 +13,7 @@ pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
 
 #[cfg(feature = "integration-test")]
 pub use consts::{
-    MAPPED_MEMORY_EXTENSION_SIZE, POOL_SIZE, TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START,
+    TANK_SIZE, POOL_SIZE, TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START,
 };
 
 #[cfg(feature = "integration-test")]

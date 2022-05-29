@@ -18,17 +18,17 @@ impl Pool {
         }
     }
 
-    // calling this method after it returns Err will provide invalid results
-    pub fn next_addr(&mut self, size: usize) -> Result<usize, PoolAllocError> {
+    // calling this method after it returns None will provide invalid results
+    pub fn next_addr(&mut self, size: usize) -> Option<usize> {
         let addr = align_up(self.next_addr, consts::STANDARD_ALIGN);
 
         self.next_addr = addr + size;
 
         if self.next_addr > self.end_addr {
-            return Err(PoolAllocError::new(addr, self.end_addr - addr));
+            None
+        } else {
+            Some(addr)
         }
-
-        Ok(addr)
     }
 }
 
@@ -40,17 +40,5 @@ impl Drop for Pool {
             eprintln!("Error with code: {}, when calling munmap!", err);
             panic!("");
         }
-    }
-}
-
-// TODO impl Error trait for this struct once it becomes available for core
-pub struct PoolAllocError {
-    pub addr: usize,
-    pub allocated: usize,
-}
-
-impl PoolAllocError {
-    fn new(addr: usize, allocated: usize) -> Self {
-        PoolAllocError { addr, allocated }
     }
 }

@@ -1,4 +1,5 @@
 mod addr_meta;
+mod bin;
 mod pool_allocator;
 
 use crate::consts;
@@ -11,24 +12,37 @@ use core::cell::RefCell;
 use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
 use libc_print::std_name::eprintln;
+use crate::metadata::thread_meta::bin::Bin;
+use arr_macro::arr;
+use crate::consts::BINS_NO;
 
 pub struct ThreadMeta<'a, A: Allocator> {
     addr2ameta: HashMap<usize, AddrMeta<'a, A>, DefaultHashBuilder, &'a A>,
-    pool: RcAlloc<RefCell<Pool>, &'a A>,
     pool_alloc: PoolAllocator,
-    i: usize,
+    bins: [Bin<'a, A>; consts::BINS_NO]
 }
 
 impl<'a, A: Allocator> ThreadMeta<'a, A> {
     pub fn new_in(first_addr: usize, allocator: &'a A) -> Self {
         let mut pool_alloc = PoolAllocator::new(first_addr);
-        let current_pool = pool_alloc.next_pool();
+        let mut size = consts::STANDARD_ALIGN / 2;
+
+        // this is for assuring consistency, arr! only accepts a literal
+        assert_eq!(consts::BINS_NO, 10);
 
         ThreadMeta {
             addr2ameta: HashMap::with_capacity_in(consts::RESV_ADDRS_NO, allocator),
-            pool: RcAlloc::new_in(RefCell::new(current_pool), allocator),
+            bins: arr![
+                Bin::new(
+                    { size <<= 1; size },
+                    RcAlloc::new_in(
+                        RefCell::new(pool_alloc.next_pool()),
+                        allocator
+                    )
+                );
+                10
+            ],
             pool_alloc,
-            i: 0,
         }
     }
 
@@ -38,30 +52,21 @@ impl<'a, A: Allocator> ThreadMeta<'a, A> {
             return self.pool_alloc.next_region(size);
         }
 
-        let addr = self.pool.borrow_mut().next_addr(size);
-        self.i += 1;
-        let (addr, addr_meta) = match addr {
-            Ok(addr) => (addr, AddrMeta::new_single_pool(size, self.pool.clone())),
+        let bin_index = self.size2bin_index(size);
+        let bin = &mut self.bins[bin_index];
 
-            Err(alloc_err) => {
-                let new_pool = RcAlloc::new_in(
-                    RefCell::new(self.pool_alloc.next_pool()),
-                    *self.addr2ameta.allocator(),
-                );
+        let addr = bin.pool.borrow_mut().next_addr(size);
+        let addr = addr.unwrap_or_else(|| {
+            bin.pool = RcAlloc::new_in(
+                RefCell::new(self.pool_alloc.next_pool()),
+                *self.addr2ameta.allocator(),
+            );
 
-                let addr_meta = if alloc_err.allocated != 0 {
-                    AddrMeta::new_double_pool(size, self.pool.clone(), new_pool.clone())
-                } else {
-                    AddrMeta::new_single_pool(size, new_pool.clone())
-                };
+            bin.pool.borrow_mut().next_addr(size).unwrap()
+        });
 
-                self.pool = new_pool;
-
-                (alloc_err.addr, addr_meta)
-            }
-        };
-
-        self.addr2ameta.insert(addr, addr_meta);
+        self.addr2ameta
+            .insert(addr, AddrMeta::new(size, bin.pool.clone()));
 
         addr
     }
@@ -79,5 +84,16 @@ impl<'a, A: Allocator> ThreadMeta<'a, A> {
         }
 
         self.addr2ameta.remove(&addr);
+    }
+
+    // TODO optimise this
+    fn size2bin_index(&self, size: usize) -> usize {
+        if size <= consts::STANDARD_ALIGN {
+            0
+        } else if size >= consts::PAGE_SIZE {
+            consts::BINS_NO - 1
+        } else {
+            (size.next_power_of_two().trailing_zeros() - 4) as usize
+        }
     }
 }

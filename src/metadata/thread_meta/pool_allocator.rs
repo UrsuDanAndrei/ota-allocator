@@ -27,7 +27,7 @@ impl PoolAllocator {
         self.next_pool_addr += consts::POOL_SIZE;
 
         if self.next_pool_addr > self.last_mapped_addr {
-            self.extend_mapped_region(consts::MAPPED_MEMORY_EXTENSION_SIZE);
+            self.extend_mapped_region(consts::TANK_SIZE);
         }
 
         pool
@@ -44,7 +44,7 @@ impl PoolAllocator {
         self.next_pool_addr += size;
 
         if self.next_pool_addr > self.last_mapped_addr {
-            self.extend_mapped_region(cmp::max(consts::MAPPED_MEMORY_EXTENSION_SIZE, size));
+            self.extend_mapped_region(cmp::max(consts::TANK_SIZE, size));
         }
 
         region

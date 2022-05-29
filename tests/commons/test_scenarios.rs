@@ -59,13 +59,13 @@ pub fn many_small_allocations() {
     }
 
     // trigger a second mmap call
-    for _ in 0..(ota_allocator::MAPPED_MEMORY_EXTENSION_SIZE / 16 + 1) {
+    for _ in 0..(ota_allocator::TANK_SIZE / 16 + 1) {
         let _ = Box::new(to_box);
     }
 
     // trigger multiple mmap calls
     for _ in 0..4 {
-        for _ in 0..(ota_allocator::MAPPED_MEMORY_EXTENSION_SIZE / 16) {
+        for _ in 0..(ota_allocator::TANK_SIZE / 16) {
             let _ = Box::new(to_box);
         }
     }
