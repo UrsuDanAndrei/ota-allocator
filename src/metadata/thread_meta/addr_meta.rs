@@ -1,23 +1,29 @@
+use crate::metadata::thread_meta::small_allocator::pool::Pool;
 use crate::utils::rc_alloc::RcAlloc;
 use core::alloc::Allocator;
 use core::cell::RefCell;
-use crate::metadata::thread_meta::small_alloc::pool::Pool;
 
-// TODO when managing big allocation make this en enum BigAddrMeta, SmallAddrMeta
-pub struct AddrMeta<'a, A: Allocator> {
-    // this is the requested size, the allocated size might be larger due to alignment
-    // TODO maybe make size private
-    pub size: usize,
+pub enum AddrMeta<'a, A: Allocator> {
+    SmallMeta {
+        // this is the requested size, the allocated size might be larger due to alignment
+        size: usize,
 
-    // the purpose of this field is to keep the pool alive at lest while this addr is still valid
-    _pool: RcAlloc<RefCell<Pool>, &'a A>,
+        // prevent the drop of the pool until this addr is freed
+        _pool: RcAlloc<RefCell<Pool>, &'a A>,
+    },
+
+    LargeMeta {
+        // this is the requested size, the allocated size might be larger due to alignment
+        size: usize,
+    },
 }
 
 impl<'a, A: Allocator> AddrMeta<'a, A> {
-    pub fn new(size: usize, pool: RcAlloc<RefCell<Pool>, &'a A>) -> Self {
-        AddrMeta {
-            size,
-            _pool: pool,
-        }
+    pub fn new_small(size: usize, pool: RcAlloc<RefCell<Pool>, &'a A>) -> Self {
+        AddrMeta::SmallMeta { size, _pool: pool }
+    }
+
+    pub fn new_large(size: usize) -> Self {
+        AddrMeta::LargeMeta { size }
     }
 }

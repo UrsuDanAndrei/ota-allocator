@@ -17,7 +17,7 @@ pub struct Metadata<'a, A: Allocator> {
     next_addr_space: usize,
     addr2tid: HashMap<usize, usize, DefaultHashBuilder, &'a A>,
     tid2tmeta: HashMap<usize, Mutex<ThreadMeta<'a, A>>, DefaultHashBuilder, &'a A>,
-    meta_alloc: &'a A
+    meta_alloc: &'a A,
 }
 
 impl<'a, A: Allocator> Metadata<'a, A> {
@@ -26,7 +26,7 @@ impl<'a, A: Allocator> Metadata<'a, A> {
             next_addr_space: first_addr_space,
             addr2tid: HashMap::with_capacity_in(consts::RESV_THREADS_NO, meta_alloc),
             tid2tmeta: HashMap::with_capacity_in(consts::RESV_THREADS_NO, meta_alloc),
-            meta_alloc
+            meta_alloc,
         }
     }
 
@@ -34,10 +34,7 @@ impl<'a, A: Allocator> Metadata<'a, A> {
         // new thread => new associated ThreadMeta structure
         self.tid2tmeta.insert(
             tid,
-            Mutex::new(ThreadMeta::new_in(
-                self.next_addr_space,
-                self.meta_alloc,
-            )),
+            Mutex::new(ThreadMeta::new_in(self.next_addr_space, self.meta_alloc)),
         );
 
         // new thread => new (address space -> thread) mapping
