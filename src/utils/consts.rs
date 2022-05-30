@@ -30,13 +30,15 @@ pub const PAGE_SIZE: usize = 4096;
 pub const FIRST_ADDR_SPACE_START: usize = 0x0000_0030_0000_0000;
 pub const ADDR_SPACE_MAX_SIZE: usize = 0x0000_0010_0000_0000;
 pub const ADDR_SPACE_MASK: usize = 0xFFFF_FFF0_0000_0000;
+pub const LARGE_ADDR_SPACE_OFFSET: usize = 0x0000_0008_0000_0000;
+pub const LARGE_ADDR_SPACE_MASK: usize = 0x0000_0008_0000_0000;
 
 pub const META_ADDR_SPACE_START: usize = 0x0000_0020_0000_0000;
 pub const META_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
 
 // TODO make this values configurable from the user
 pub const POOL_SIZE: usize = 2 * PAGE_SIZE;
-pub const TANK_SIZE: usize = 4 * POOL_SIZE;
+pub const TANK_SIZE: usize = 512 * POOL_SIZE;
 
 // TODO research how to do custom alignment per allocation instead of always using this const
 pub const STANDARD_ALIGN: usize = 16;

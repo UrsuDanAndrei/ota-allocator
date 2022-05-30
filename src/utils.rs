@@ -16,3 +16,13 @@ pub fn get_current_tid() -> usize {
 pub fn align_up(addr: usize, align: usize) -> usize {
     (addr + align - 1) & !(align - 1)
 }
+
+#[inline(always)]
+pub fn align_down(addr: usize, align: usize) -> usize {
+    addr & !(align - 1)
+}
+
+#[inline(always)]
+pub fn is_small_addr(addr: usize) -> bool {
+    addr & consts::LARGE_ADDR_SPACE_MASK == 0
+}

@@ -133,6 +133,47 @@ fn many_small_allocations() {
     commons::end_test();
 }
 
+#[test]
+fn many_bins_allocations() {
+    commons::init_test();
+
+    run_with_two_threads(
+        commons::many_bins_allocations,
+        commons::many_bins_allocations,
+    );
+
+    commons::end_test();
+}
+
+#[test]
+fn large_allocations() {
+    commons::init_test();
+
+    run_with_two_threads(commons::large_allocations, commons::large_allocations);
+
+    commons::end_test();
+}
+
+#[test]
+fn mixed_large_small_allocations() {
+    commons::init_test();
+
+    run_with_two_threads(
+        || {
+            commons::many_bins_allocations();
+            commons::large_allocations();
+            commons::large_allocations();
+            commons::many_bins_allocations();
+        },
+        || {
+            commons::simple_box_allocation();
+            commons::large_allocations();
+            commons::many_bins_allocations();
+        });
+
+    commons::end_test();
+}
+
 fn run_with_two_threads(thread1task: fn(), thread2task: fn()) {
     let t1 = thread::spawn(move || {
         thread1task();

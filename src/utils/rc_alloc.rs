@@ -43,6 +43,11 @@ impl<T, A: Allocator + Clone> RcAlloc<T, A> {
             _marker: PhantomData,
         }
     }
+
+    pub fn count(&self) -> usize {
+        let inner = unsafe { self.inner.as_ref() };
+        inner.refcount.get()
+    }
 }
 
 impl<T, A: Allocator + Clone> Deref for RcAlloc<T, A> {

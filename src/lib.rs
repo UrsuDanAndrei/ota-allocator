@@ -12,9 +12,7 @@ mod utils;
 pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
 
 #[cfg(feature = "integration-test")]
-pub use consts::{
-    TANK_SIZE, POOL_SIZE, TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START,
-};
+pub use consts::{POOL_SIZE, TANK_SIZE, TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE_START};
 
 #[cfg(feature = "integration-test")]
 pub use utils::mman_wrapper;
@@ -123,7 +121,7 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
                 panic!("");
             }
 
-            Some(addr_tmeta) => addr_tmeta.lock().free_addr(addr),
+            Some(addr_tmeta) => addr_tmeta.lock().free(addr),
         };
     }
 }
