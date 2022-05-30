@@ -1,21 +1,24 @@
 mod bin;
 pub mod pool;
 mod pool_allocator;
+mod small_meta;
 
-use crate::metadata::thread_meta::addr_meta::AddrMeta;
 use crate::metadata::thread_meta::small_allocator::bin::Bin;
 use crate::metadata::thread_meta::small_allocator::pool_allocator::PoolAllocator;
 use crate::utils::rc_alloc::RcAlloc;
 use crate::{consts, utils::mman_wrapper};
 use core::alloc::Allocator;
 use core::cell::RefCell;
+use core::ptr::addr_of;
 use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
 use libc_print::std_name::eprintln;
+use crate::metadata::thread_meta::small_allocator::small_meta::SmallMeta;
 
 pub struct SmallAllocator<'a, A: Allocator> {
     pool_alloc: PoolAllocator,
     bins: [Bin<'a, A>; consts::BINS_NO],
+    addr2smeta: HashMap<usize, SmallMeta<'a, A>, DefaultHashBuilder, &'a A>,
     meta_alloc: &'a A,
 }
 
@@ -39,11 +42,12 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
                 10
             ],
             pool_alloc,
+            addr2smeta: HashMap::with_capacity_in(consts::RESV_ADDRS_NO, meta_alloc),
             meta_alloc,
         }
     }
 
-    pub fn next_addr(&mut self, size: usize) -> (usize, AddrMeta<'a, A>) {
+    pub fn next_addr(&mut self, size: usize) -> usize {
         let bin_index = self.size2bin_index(size);
         let bin = &mut self.bins[bin_index];
 
@@ -54,7 +58,13 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
             bin.pool.borrow_mut().next_addr(size).unwrap()
         });
 
-        (addr, AddrMeta::new_small(size, bin.pool.clone()))
+        self.addr2smeta.insert(addr, SmallMeta::new(size, bin.pool.clone()));
+
+        addr
+    }
+
+    pub fn free(&mut self, addr: usize) {
+        self.addr2smeta.remove(&addr);
     }
 
     // TODO optimise this

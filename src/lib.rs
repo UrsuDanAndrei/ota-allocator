@@ -121,7 +121,7 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
                 panic!("");
             }
 
-            Some(addr_tmeta) => addr_tmeta.lock().free_addr(addr),
+            Some(addr_tmeta) => addr_tmeta.lock().free(addr),
         };
     }
 }
