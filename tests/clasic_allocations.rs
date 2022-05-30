@@ -66,3 +66,34 @@ fn many_small_allocations() {
 
     commons::end_test();
 }
+
+#[test]
+fn many_bins_allocations() {
+    commons::init_test();
+
+    commons::many_bins_allocations();
+
+    commons::end_test();
+}
+
+#[test]
+fn large_allocations() {
+    commons::init_test();
+
+    commons::large_allocations();
+
+    commons::end_test();
+}
+
+#[test]
+fn mixed_large_small_allocations() {
+    commons::init_test();
+
+    commons::many_bins_allocations();
+    commons::large_allocations();
+    commons::simple_box_allocation();
+    commons::large_allocations();
+    commons::many_bins_allocations();
+
+    commons::end_test();
+}

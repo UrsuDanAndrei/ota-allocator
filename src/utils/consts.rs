@@ -38,7 +38,7 @@ pub const META_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
 
 // TODO make this values configurable from the user
 pub const POOL_SIZE: usize = 2 * PAGE_SIZE;
-pub const TANK_SIZE: usize = 4 * POOL_SIZE;
+pub const TANK_SIZE: usize = 512 * POOL_SIZE;
 
 // TODO research how to do custom alignment per allocation instead of always using this const
 pub const STANDARD_ALIGN: usize = 16;

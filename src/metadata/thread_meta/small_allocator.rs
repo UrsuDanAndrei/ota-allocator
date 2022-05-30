@@ -3,17 +3,15 @@ pub mod pool;
 mod pool_allocator;
 mod small_meta;
 
+use crate::consts;
 use crate::metadata::thread_meta::small_allocator::bin::Bin;
 use crate::metadata::thread_meta::small_allocator::pool_allocator::PoolAllocator;
+use crate::metadata::thread_meta::small_allocator::small_meta::SmallMeta;
 use crate::utils::rc_alloc::RcAlloc;
-use crate::{consts, utils::mman_wrapper};
 use core::alloc::Allocator;
 use core::cell::RefCell;
-use core::ptr::addr_of;
 use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
-use libc_print::std_name::eprintln;
-use crate::metadata::thread_meta::small_allocator::small_meta::SmallMeta;
 
 pub struct SmallAllocator<'a, A: Allocator> {
     pool_alloc: PoolAllocator,
@@ -25,7 +23,6 @@ pub struct SmallAllocator<'a, A: Allocator> {
 impl<'a, A: Allocator> SmallAllocator<'a, A> {
     pub fn new_in(first_addr: usize, meta_alloc: &'a A) -> Self {
         let mut pool_alloc = PoolAllocator::new(first_addr);
-        let mut size = consts::STANDARD_ALIGN / 2;
 
         // this is for assuring consistency, arr! only accepts a literal
         assert_eq!(consts::BINS_NO, 10);
@@ -33,7 +30,6 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
         SmallAllocator {
             bins: arr_macro::arr![
                 Bin::new(
-                    { size <<= 1; size },
                     RcAlloc::new_in(
                         RefCell::new(pool_alloc.next_pool()),
                         meta_alloc
@@ -58,7 +54,8 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
             bin.pool.borrow_mut().next_addr(size).unwrap()
         });
 
-        self.addr2smeta.insert(addr, SmallMeta::new(size, bin.pool.clone()));
+        self.addr2smeta
+            .insert(addr, SmallMeta::new(bin.pool.clone()));
 
         addr
     }
