@@ -7,6 +7,7 @@ extern crate alloc;
 
 mod metadata;
 mod utils;
+pub mod c_glue;
 
 // reexports
 pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
