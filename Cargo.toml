@@ -7,7 +7,12 @@ edition = "2021"
 [lib]
 name = "ota_allocator"
 crate-type = ["staticlib"]
-#crate-type = ["cdylib"]
+# crate-type = ["cdylib"]
+
+[profile.release]
+lto = true
+codegen-units = 1
+panic = "abort"
 
 [features]
 integration-test = []

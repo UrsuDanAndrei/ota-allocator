@@ -1,8 +1,8 @@
 // TODO figure out the proper value to use here
-pub const RESV_THREADS_NO: usize = 0;
+pub const RESV_THREADS_NO: usize = 8;
 
 // TODO figure out the proper value to use here
-pub const RESV_ADDRS_NO: usize = 0;
+pub const RESV_ADDRS_NO: usize = 16;
 
 // TODO make take this from the OS
 pub const PAGE_SIZE: usize = 4096;
@@ -27,13 +27,23 @@ pub const PAGE_SIZE: usize = 4096;
 // - the 2 limitations above directly influence each other, if one improves the other worsens
 // - TODO find the sweet spot to use as default, but give the user the option to adjust
 //
-pub const FIRST_ADDR_SPACE_START: usize = 0x0000_0030_0000_0000;
-pub const ADDR_SPACE_MAX_SIZE: usize = 0x0000_0010_0000_0000;
-pub const ADDR_SPACE_MASK: usize = 0xFFFF_FFF0_0000_0000;
-pub const LARGE_ADDR_SPACE_OFFSET: usize = 0x0000_0008_0000_0000;
-pub const LARGE_ADDR_SPACE_MASK: usize = 0x0000_0008_0000_0000;
+// pub const FIRST_ADDR_SPACE_START: usize = 0x0000_0030_0000_0000;
+// pub const ADDR_SPACE_MAX_SIZE: usize = 0x0000_0010_0000_0000;
+// pub const ADDR_SPACE_MASK: usize = 0xFFFF_FFF0_0000_0000;
+// pub const LARGE_ADDR_SPACE_OFFSET: usize = 0x0000_0008_0000_0000;
+// pub const LARGE_ADDR_SPACE_MASK: usize = 0x0000_0008_0000_0000;
+//
+// pub const META_ADDR_SPACE_START: usize = 0x0000_0020_0000_0000;
+// pub const META_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
 
-pub const META_ADDR_SPACE_START: usize = 0x0000_0020_0000_0000;
+// values for 1TB max memory allocation, 128 max threads
+pub const FIRST_ADDR_SPACE_START: usize = 0x0000_0300_0000_0000;
+pub const ADDR_SPACE_MAX_SIZE: usize = 0x0000_0100_0000_0000;
+pub const ADDR_SPACE_MASK: usize = 0xFFFF_FF00_0000_0000;
+pub const LARGE_ADDR_SPACE_OFFSET: usize = 0x0000_0080_0000_0000;
+pub const LARGE_ADDR_SPACE_MASK: usize = 0x0000_0080_0000_0000;
+
+pub const META_ADDR_SPACE_START: usize = 0x0000_0200_0000_0000;
 pub const META_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
 
 // TODO make this values configurable from the user
@@ -46,7 +56,7 @@ pub const STANDARD_ALIGN: usize = 16;
 pub const BINS_NO: usize = 10;
 
 #[cfg(feature = "integration-test")]
-pub const TEST_ADDR_SPACE_START: usize = 0x0000_0010_0000_0000;
+pub const TEST_ADDR_SPACE_START: usize = 0x0000_0100_0000_0000;
 
 #[cfg(feature = "integration-test")]
 pub const TEST_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
