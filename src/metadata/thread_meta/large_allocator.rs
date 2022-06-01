@@ -65,7 +65,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
         addr
     }
 
-    pub fn free(&self, addr: usize) {
+    pub fn free(&mut self, addr: usize) {
         let lmeta = self.addr2lmeta.get(&addr).unwrap();
 
         let first_page = if lmeta.first_page.count() == 1 {
@@ -87,6 +87,8 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
             eprintln!("Error with code: {}, when calling munmap!", err);
             panic!("");
         }
+
+        self.addr2lmeta.remove(&addr);
     }
 
     fn expand_mapped_region(&mut self, size: usize) {

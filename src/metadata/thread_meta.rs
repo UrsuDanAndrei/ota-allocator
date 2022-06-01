@@ -23,7 +23,7 @@ impl<'a, A: Allocator> ThreadMeta<'a, A> {
     }
 
     pub fn next_addr(&mut self, size: usize) -> usize {
-        if size < consts::POOL_SIZE {
+        if size <= consts::POOL_SIZE {
             self.small_alloc.next_addr(size)
         } else {
             self.large_alloc.next_addr(size)
