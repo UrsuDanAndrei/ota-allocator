@@ -6,13 +6,12 @@ edition = "2021"
 # delete this section when testing
 [lib]
 name = "ota_allocator"
-crate-type = ["staticlib"]
-# crate-type = ["cdylib"]
+#crate-type = ["staticlib"]
+crate-type = ["cdylib"]
 
 [profile.release]
 lto = true
 codegen-units = 1
-panic = "abort"
 
 [features]
 integration-test = []

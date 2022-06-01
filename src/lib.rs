@@ -5,9 +5,9 @@
 
 extern crate alloc;
 
+pub mod c_glue;
 mod metadata;
 mod utils;
-pub mod c_glue;
 
 // reexports
 pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
@@ -124,5 +124,9 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
 
             Some(addr_tmeta) => addr_tmeta.lock().free(addr),
         };
+    }
+
+    unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
+        self.alloc(layout)
     }
 }

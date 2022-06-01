@@ -25,7 +25,7 @@ pub extern "C" fn ota_init() {
 }
 
 #[no_mangle]
-pub extern "C" fn ota_malloc(size: usize) -> *mut u8 {
+pub extern "C" fn malloc(size: usize) -> *mut u8 {
     unsafe {
         // the align field is used to conform to the function signature, it is not used
         ALLOCATOR.alloc(Layout::from_size_align_unchecked(size, consts::STANDARD_ALIGN))
@@ -33,7 +33,23 @@ pub extern "C" fn ota_malloc(size: usize) -> *mut u8 {
 }
 
 #[no_mangle]
-pub extern "C" fn ota_free(addr: *mut u8) {
+pub extern "C" fn calloc(number: usize, size: usize) -> *mut u8 {
+    unsafe {
+        // the align field is used to conform to the function signature, it is not used
+        ALLOCATOR.alloc_zeroed(Layout::from_size_align_unchecked(size * number, consts::STANDARD_ALIGN))
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn realloc(addr: *mut u8, size: usize) -> *mut u8 {
+    unsafe {
+        // the align field is used to conform to the function signature, it is not used
+        ALLOCATOR.realloc(addr, Layout::from_size_align_unchecked(size, consts::STANDARD_ALIGN), size)
+    }
+}
+
+#[no_mangle]
+pub extern "C" fn free(addr: *mut u8) {
     unsafe {
         // the layout field is used to conform to the function signature, it is not used
         ALLOCATOR.dealloc(addr, Layout::from_size_align_unchecked(consts::STANDARD_ALIGN, consts::STANDARD_ALIGN));

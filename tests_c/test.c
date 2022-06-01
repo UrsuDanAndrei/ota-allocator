@@ -23,14 +23,14 @@ void mmap_wrapper(void *addr, int size) {
 }
 
 int main() {
-	ota_init();
+//	ota_init();
 
 	time_t start = time(NULL);
 
 	for (int i = 0; i < N; ++i) {
-		char *s = ota_malloc(/*i % 2048 + */32);
+//		char *s = malloc(/*i % 2048 + */32);
 		strcpy(s, "rust rocks");
-		ota_free(s);
+//		free(s);
 //		printf("i: %d\n", i);
 	}
 
