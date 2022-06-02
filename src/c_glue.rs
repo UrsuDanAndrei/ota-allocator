@@ -10,6 +10,7 @@ type MetaAlloc = LockedHeap<{ BUDDY_ALLOCATOR_ORDER }>;
 
 static mut ALLOCATOR: OtaAllocator<'static, MetaAlloc> = OtaAllocator::new_in(MetaAlloc::new());
 static IS_INIT: AtomicBool = AtomicBool::new(false);
+static DONE_INIT: AtomicBool = AtomicBool::new(false);
 
 #[no_mangle]
 pub extern "C" fn ota_init() {
@@ -38,6 +39,11 @@ pub extern "C" fn malloc(size: usize) -> *mut u8 {
         // FIXME this is not a solution for multi-threading !!!, all threads must wait until init is completed
         if !IS_INIT.swap(true, Ordering::Relaxed) {
             ota_init();
+            DONE_INIT.store(true, Ordering::Relaxed);
+        }
+
+        while !DONE_INIT.load(Ordering::Relaxed) {
+
         }
 
         // the align field is used to conform to the function signature, it is not used
@@ -54,6 +60,11 @@ pub extern "C" fn calloc(number: usize, size: usize) -> *mut u8 {
         // FIXME this is not a solution for multi-threading !!!, all threads must wait until init is completed
         if !IS_INIT.swap(true, Ordering::Relaxed) {
             ota_init();
+            DONE_INIT.store(true, Ordering::Relaxed);
+        }
+
+        while !DONE_INIT.load(Ordering::Relaxed) {
+
         }
 
         // the align field is used to conform to the function signature, it is not used
@@ -70,6 +81,11 @@ pub extern "C" fn realloc(addr: *mut u8, size: usize) -> *mut u8 {
         // FIXME this is not a solution for multi-threading !!!, all threads must wait until init is completed
         if !IS_INIT.swap(true, Ordering::Relaxed) {
             ota_init();
+            DONE_INIT.store(true, Ordering::Relaxed);
+        }
+
+        while !DONE_INIT.load(Ordering::Relaxed) {
+
         }
 
         // the align field is used to conform to the function signature, it is not used
@@ -83,6 +99,15 @@ pub extern "C" fn realloc(addr: *mut u8, size: usize) -> *mut u8 {
 
 #[no_mangle]
 pub extern "C" fn free(addr: *mut u8) {
+    if !IS_INIT.swap(true, Ordering::Relaxed) {
+        ota_init();
+        DONE_INIT.store(true, Ordering::Relaxed);
+    }
+
+    while !DONE_INIT.load(Ordering::Relaxed) {
+
+    }
+
     unsafe {
         // the layout field is used to conform to the function signature, it is not used
         ALLOCATOR.dealloc(
@@ -91,3 +116,6 @@ pub extern "C" fn free(addr: *mut u8) {
         );
     }
 }
+
+
+// size_t malloc_usable_size(	const void *ptr);

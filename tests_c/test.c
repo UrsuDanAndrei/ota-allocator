@@ -26,13 +26,15 @@ int main() {
 //	ota_init();
 
 	time_t start = time(NULL);
-	ota_init();
+//	ota_init();
 //	for (int i = 0; i < 1; ++i) {
 //		char *s = malloc(/*i % 2048 + */32);
 //		strcpy(s, "rust rocks");
 //		free(s);
 ////		printf("i: %d\n", i);
 //	}
+	char *c = malloc(1);
+	*c = 'a';
 
 	time_t finish = time(NULL);
 

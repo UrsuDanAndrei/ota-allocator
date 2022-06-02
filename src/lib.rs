@@ -50,6 +50,7 @@ pub struct OtaAllocator<'a, GA: GlobalAlloc> {
     meta_alloc: AllocatorWrapper<GA>,
 }
 
+// FIXME maybe add malloc_usable_size !!!!!!!
 impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
     pub const fn new_in(meta_alloc: GA) -> Self {
         OtaAllocator {
@@ -60,6 +61,13 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
 
     // this function must be called EXACTLY once before using the allocator
     pub fn init(&'a mut self) {
+
+        // let i = 0;
+
+        // while i == 0 {
+        unsafe { libc::usleep(15_000_000); }
+        // }
+
         self.meta = Some(RwLock::new(Metadata::new_in(
             consts::FIRST_ADDR_SPACE_START,
             &self.meta_alloc,
@@ -85,7 +93,13 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
 
 unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
+        eprintln!("Allocated: {}", layout.size());
         let size = layout.size();
+
+        if size == 1 {
+            let x = 1;
+        }
+
         let tid = utils::get_current_tid();
         let mut read_meta = self.read_meta();
 
@@ -107,19 +121,26 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
 
             Some(tmeta) => tmeta,
         };
-
+        // 139894489798528
         let addr = tmeta.lock().next_addr(size);
         addr as *mut u8
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
+        // eprintln!("Free: {}", ptr as usize);
         let addr = ptr as usize;
         let read_meta = self.read_meta();
 
         match read_meta.get_addr_tmeta(addr) {
             None => {
-                eprintln!("Invalid or double free!");
-                panic!("");
+
+                // if addr == 0 {
+                //     return;
+                // }
+
+                // eprintln!("Invalid or double free! addr: {}", addr);
+                // panic!("");
+                return;
             }
 
             Some(addr_tmeta) => addr_tmeta.lock().free(addr),
@@ -128,5 +149,10 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
 
     unsafe fn alloc_zeroed(&self, layout: Layout) -> *mut u8 {
         self.alloc(layout)
+    }
+
+    unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
+        self.dealloc(ptr, layout);
+        self.alloc(Layout::from_size_align_unchecked(new_size, layout.size()))
     }
 }
