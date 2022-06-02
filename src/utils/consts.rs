@@ -2,7 +2,7 @@
 pub const RESV_THREADS_NO: usize = 8;
 
 // TODO figure out the proper value to use here
-pub const RESV_ADDRS_NO: usize = 16;
+pub const RESV_ADDRS_NO: usize = 1024;
 
 // TODO make take this from the OS
 pub const PAGE_SIZE: usize = 4096;

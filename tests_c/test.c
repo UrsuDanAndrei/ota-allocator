@@ -26,13 +26,13 @@ int main() {
 //	ota_init();
 
 	time_t start = time(NULL);
-
-	for (int i = 0; i < 1; ++i) {
-		char *s = malloc(/*i % 2048 + */32);
-		strcpy(s, "rust rocks");
-		free(s);
-//		printf("i: %d\n", i);
-	}
+	ota_init();
+//	for (int i = 0; i < 1; ++i) {
+//		char *s = malloc(/*i % 2048 + */32);
+//		strcpy(s, "rust rocks");
+//		free(s);
+////		printf("i: %d\n", i);
+//	}
 
 	time_t finish = time(NULL);
 
@@ -40,3 +40,5 @@ int main() {
 
 	return 0;
 }
+
+// run with RUSTFLAGS="-C target-cpu=native" cargo build --release && make clean && make && ./test
