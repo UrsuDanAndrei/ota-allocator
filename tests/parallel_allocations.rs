@@ -169,7 +169,8 @@ fn mixed_large_small_allocations() {
             commons::simple_box_allocation();
             commons::large_allocations();
             commons::many_bins_allocations();
-        });
+        },
+    );
 
     commons::end_test();
 }

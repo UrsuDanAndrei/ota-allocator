@@ -11,14 +11,13 @@ use crate::utils::rc_alloc::RcAlloc;
 use core::alloc::Allocator;
 use core::cell::RefCell;
 use core::hash::BuildHasherDefault;
-use rustc_hash::FxHasher;
-use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
+use rustc_hash::FxHasher;
 
 pub struct SmallAllocator<'a, A: Allocator> {
     pool_alloc: PoolAllocator,
     bins: [Bin<'a, A>; consts::BINS_NO],
-    addr2smeta: HashMap<usize, SmallMeta<'a, A>, BuildHasherDefault::<FxHasher>, &'a A>,
+    addr2smeta: HashMap<usize, SmallMeta<'a, A>, BuildHasherDefault<FxHasher>, &'a A>,
     meta_alloc: &'a A,
 }
 
@@ -40,7 +39,11 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
                 10
             ],
             pool_alloc,
-            addr2smeta: HashMap::with_capacity_and_hasher_in(consts::RESV_ADDRS_NO, BuildHasherDefault::<FxHasher>::default(), meta_alloc),
+            addr2smeta: HashMap::with_capacity_and_hasher_in(
+                consts::RESV_ADDRS_NO,
+                BuildHasherDefault::<FxHasher>::default(),
+                meta_alloc,
+            ),
             meta_alloc,
         }
     }
