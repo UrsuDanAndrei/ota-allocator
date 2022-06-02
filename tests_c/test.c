@@ -27,22 +27,16 @@ int main() {
 
 	time_t start = time(NULL);
 
-	for (int i = 0; i < N; ++i) {
-//		char *s = malloc(/*i % 2048 + */32);
+	for (int i = 0; i < 1; ++i) {
+		char *s = malloc(/*i % 2048 + */32);
 		strcpy(s, "rust rocks");
-//		free(s);
+		free(s);
 //		printf("i: %d\n", i);
 	}
 
 	time_t finish = time(NULL);
 
-
 	printf("Time elapsed: %lds\n", finish - start);
 
 	return 0;
 }
-
-//void *addr = 0x00008FFFFFFF0000;
-//int size = 4096;
-//
-//mmap_wrapper(addr, size);

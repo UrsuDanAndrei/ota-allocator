@@ -1,9 +1,17 @@
+LIB_LOCATION=$(pwd)/../target/release
+
 all: build
 
 build: test
 
 test: test.c
-	gcc test.c -o test -I../c_glue -L../target/release -lota_allocator -lpthread -Wl,--no-as-needed -ldl
+	# YOU ALSO NEED TO export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/username/foo:/home/dan/workspace/licenta/ota-allocator/tests_c/../target/release
+	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/dan/workspace/licenta/ota-allocator/tests_c/../target/release \
+	gcc test.c -o test \
+		-I../c_glue \
+		-L/home/dan/workspace/licenta/ota-allocator/tests_c/../target/release \
+		-lota_allocator -lpthread \
+		-Wl,--no-as-needed -ldl
 
 test_preload: test.c
 	LD_PRELOAD=../target/release/libota_allocator.so gcc test.c -o test -I../c_glue -L../target/release -lota_allocator -lpthread

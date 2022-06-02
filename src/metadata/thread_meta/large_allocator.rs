@@ -4,6 +4,8 @@ use crate::metadata::thread_meta::large_allocator::large_meta::LargeMeta;
 use crate::utils::rc_alloc::RcAlloc;
 use crate::{consts, utils, utils::mman_wrapper};
 use core::alloc::Allocator;
+use core::hash::BuildHasherDefault;
+use rustc_hash::FxHasher;
 use hashbrown::hash_map::DefaultHashBuilder;
 use hashbrown::HashMap;
 use libc_print::std_name::eprintln;
@@ -12,7 +14,7 @@ pub struct LargeAllocator<'a, A: Allocator> {
     last_mapped_addr: usize, // open endpoint
     next_addr: usize,
     current_page: RcAlloc<Page, &'a A>,
-    addr2lmeta: HashMap<usize, LargeMeta<'a, A>, DefaultHashBuilder, &'a A>,
+    addr2lmeta: HashMap<usize, LargeMeta<'a, A>, BuildHasherDefault::<FxHasher>, &'a A>,
     meta_alloc: &'a A,
 }
 
@@ -24,7 +26,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
             last_mapped_addr: first_addr,
             next_addr: first_addr,
             current_page: RcAlloc::new_in(Page(first_addr), meta_alloc),
-            addr2lmeta: HashMap::with_capacity_in(consts::RESV_ADDRS_NO, meta_alloc),
+            addr2lmeta: HashMap::with_capacity_and_hasher_in(consts::RESV_ADDRS_NO, BuildHasherDefault::<FxHasher>::default(), meta_alloc),
             meta_alloc,
         };
 
