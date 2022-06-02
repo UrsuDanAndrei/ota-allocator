@@ -44,7 +44,7 @@ pub const LARGE_ADDR_SPACE_OFFSET: usize = 0x0000_0080_0000_0000;
 pub const LARGE_ADDR_SPACE_MASK: usize = 0x0000_0080_0000_0000;
 
 pub const META_ADDR_SPACE_START: usize = 0x0000_0200_0000_0000;
-pub const META_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
+pub const META_ADDR_SPACE_MAX_SIZE: usize = TANK_SIZE;
 
 // TODO make this values configurable from the user
 pub const POOL_SIZE: usize = 2 * PAGE_SIZE;

@@ -3,7 +3,7 @@ name = "ota-allocator"
 version = "0.1.0"
 edition = "2021"
 
-# delete this section when testing
+# delete this section and comment c_glue.rs before when testing
 [lib]
 name = "ota_allocator"
 #crate-type = ["staticlib"]
