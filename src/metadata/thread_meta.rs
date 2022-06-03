@@ -40,7 +40,7 @@ impl<'a, A: Allocator> ThreadMeta<'a, A> {
     }
 
     pub fn usable_size(&self, addr: usize) -> usize {
-        libc_eprintln!("YEP, thread_meta!");
+        // libc_eprintln!("YEP, thread_meta!");
         if utils::is_small_addr(addr) {
             self.small_alloc.usable_size(addr)
         } else {

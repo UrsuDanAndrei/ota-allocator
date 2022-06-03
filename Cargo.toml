@@ -4,10 +4,10 @@ version = "0.1.0"
 edition = "2021"
 
 # delete this section and comment c_glue.rs before when testing
-#[lib]
-#name = "ota_allocator"
-##crate-type = ["staticlib"]
-#crate-type = ["cdylib"]
+[lib]
+name = "ota_allocator"
+#crate-type = ["staticlib"]
+crate-type = ["cdylib"]
 
 [profile.release]
 lto = true

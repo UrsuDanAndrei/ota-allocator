@@ -72,7 +72,14 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
     }
 
     pub fn free(&mut self, addr: usize) {
-        let lmeta = self.addr2lmeta.get(&addr).unwrap();
+        let lmeta = self.addr2lmeta.remove(&addr);
+
+        if lmeta.is_none() {
+            libc_eprintln!("Invalid or double free! addr: {}", addr);
+            return;
+        }
+
+        let lmeta = lmeta.unwrap();
 
         let first_page = if lmeta.first_page.count() == 1 {
             lmeta.first_page.0
@@ -93,13 +100,17 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
             eprintln!("Error with code: {}, when calling munmap!", err);
             panic!("");
         }
-
-        self.addr2lmeta.remove(&addr);
     }
 
+    // TODO see what to do with size, maybe actually get use to this function
     pub fn usable_size(&self, addr: usize) -> usize {
-        libc_eprintln!("YEP, somewhere else!");
-        self.addr2lmeta.get(&addr).unwrap().size
+        match self.addr2lmeta.get(&addr) {
+            None => {
+                libc_eprintln!("Invalid or already freed address: {}", addr);
+                0
+            },
+            Some(lmeta) => lmeta.size,
+        }
     }
 
     fn expand_mapped_region(&mut self, size: usize) {
