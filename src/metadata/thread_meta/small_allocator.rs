@@ -12,6 +12,7 @@ use core::alloc::Allocator;
 use core::cell::RefCell;
 use core::hash::BuildHasherDefault;
 use hashbrown::HashMap;
+use libc_print::libc_eprintln;
 use rustc_hash::FxHasher;
 
 pub struct SmallAllocator<'a, A: Allocator> {
@@ -60,13 +61,27 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
         });
 
         self.addr2smeta
-            .insert(addr, SmallMeta::new(bin.pool.clone()));
+            .insert(addr, SmallMeta::new(size, bin.pool.clone()));
 
         addr
     }
 
     pub fn free(&mut self, addr: usize) {
         self.addr2smeta.remove(&addr);
+    }
+
+    // TODO see what to do with size, maybe actually get use to this function
+    pub fn usable_size(&self, addr: usize) -> usize {
+        libc_eprintln!("YEP, somewhere else small!");
+        match self.addr2smeta.get(&addr) {
+            None => {
+                libc_eprintln!("sssssssssssssssssssssss!");
+            },
+            Some(x) => (),
+        };
+        let x = self.addr2smeta.get(&addr).unwrap().size;
+        libc_eprintln!("YEP, somewhere else small, again yyy!");
+        x
     }
 
     // TODO optimise this

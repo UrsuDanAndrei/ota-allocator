@@ -1,5 +1,7 @@
-use errno_no_std;
 use libc;
+
+// DON'T ERASE THIS LINE
+use errno;
 
 pub unsafe fn mmap(addr: usize, size: usize) -> Result<(), i32> {
     let mmap_addr = libc::mmap(
@@ -13,7 +15,7 @@ pub unsafe fn mmap(addr: usize, size: usize) -> Result<(), i32> {
 
     // because -1 causes E0600, !0 is used here instead
     if mmap_addr == !0 as *mut libc::c_void {
-        Err(errno_no_std::errno().0)
+        Err(*libc::__errno_location())
     } else {
         Ok(())
     }
@@ -22,7 +24,7 @@ pub unsafe fn mmap(addr: usize, size: usize) -> Result<(), i32> {
 pub unsafe fn munmap(addr: usize, size: usize) -> Result<(), i32> {
     let err = libc::munmap(addr as *mut libc::c_void, size);
     if err == -1 {
-        Err(errno_no_std::errno().0)
+        Err(*libc::__errno_location())
     } else {
         Ok(())
     }
