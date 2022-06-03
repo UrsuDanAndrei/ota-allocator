@@ -117,5 +117,7 @@ pub extern "C" fn free(addr: *mut u8) {
     }
 }
 
-
-// size_t malloc_usable_size(	const void *ptr);
+#[no_mangle]
+pub extern "C" fn malloc_usable_size(addr: *mut u8) -> usize {
+    unsafe { ALLOCATOR.usable_size(addr) }
+}

@@ -16,4 +16,6 @@ void *realloc(void *ptr, size_t size);
 
 void free(void *ptr);
 
+size_t malloc_usable_size(const void *ptr);
+
 #endif // OTA_ALLOCATOR_H

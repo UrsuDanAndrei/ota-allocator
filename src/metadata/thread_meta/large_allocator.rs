@@ -6,6 +6,7 @@ use crate::{consts, utils, utils::mman_wrapper};
 use core::alloc::Allocator;
 use core::hash::BuildHasherDefault;
 use hashbrown::HashMap;
+use libc_print::libc_eprintln;
 use libc_print::std_name::eprintln;
 use rustc_hash::FxHasher;
 
@@ -62,7 +63,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
 
         self.addr2lmeta.insert(
             addr,
-            LargeMeta::new_in(size, self.current_page.clone(), next_page.clone()),
+            LargeMeta::new(size, self.current_page.clone(), next_page.clone()),
         );
 
         self.current_page = next_page;
@@ -94,6 +95,11 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
         }
 
         self.addr2lmeta.remove(&addr);
+    }
+
+    pub fn usable_size(&self, addr: usize) -> usize {
+        libc_eprintln!("YEP, somewhere else!");
+        self.addr2lmeta.get(&addr).unwrap().size
     }
 
     fn expand_mapped_region(&mut self, size: usize) {

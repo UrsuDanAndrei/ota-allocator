@@ -4,7 +4,7 @@
 #include <time.h>
 #include <sys/mman.h>
 #include <errno.h>
-#include <ota_allocator.h>
+//#include <ota_allocator.h>
 
 const int N = 2000000000;
 
@@ -33,8 +33,9 @@ int main() {
 //		free(s);
 ////		printf("i: %d\n", i);
 //	}
-	char *c = malloc(1);
-	*c = 'a';
+	char *s = malloc(8);
+	strcpy(s, "vxv");
+	printf("size is: %d\n", malloc_usable_size(s));
 
 	time_t finish = time(NULL);
 
