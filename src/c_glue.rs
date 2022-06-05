@@ -78,7 +78,7 @@ pub static DONE_INIT: AtomicBool = AtomicBool::new(false);
 #[no_mangle]
 #[inline(always)]
 pub extern "C" fn ota_init() {
-    if !DONE_INIT.load(Ordering::Relaxed) {
+    if !IS_INIT.load(Ordering::Relaxed) {
         if !IS_INIT.swap(true, Ordering::Relaxed) {
             unsafe {
                 ALLOCATOR.init();
