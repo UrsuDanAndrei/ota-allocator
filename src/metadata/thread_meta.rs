@@ -5,6 +5,7 @@ use crate::metadata::thread_meta::large_allocator::LargeAllocator;
 use crate::metadata::thread_meta::small_allocator::SmallAllocator;
 use crate::{consts, utils};
 use core::alloc::Allocator;
+use libc_print::libc_eprintln;
 
 pub struct ThreadMeta<'a, A: Allocator> {
     small_alloc: SmallAllocator<'a, A>,
@@ -35,6 +36,15 @@ impl<'a, A: Allocator> ThreadMeta<'a, A> {
             self.small_alloc.free(addr);
         } else {
             self.large_alloc.free(addr);
+        }
+    }
+
+    pub fn usable_size(&self, addr: usize) -> usize {
+        // libc_eprintln!("YEP, thread_meta!");
+        if utils::is_small_addr(addr) {
+            self.small_alloc.usable_size(addr)
+        } else {
+            self.large_alloc.usable_size(addr)
         }
     }
 }

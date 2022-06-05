@@ -4,15 +4,17 @@ use crate::metadata::thread_meta::large_allocator::large_meta::LargeMeta;
 use crate::utils::rc_alloc::RcAlloc;
 use crate::{consts, utils, utils::mman_wrapper};
 use core::alloc::Allocator;
-use hashbrown::hash_map::DefaultHashBuilder;
+use core::hash::BuildHasherDefault;
 use hashbrown::HashMap;
+use libc_print::libc_eprintln;
 use libc_print::std_name::eprintln;
+use rustc_hash::FxHasher;
 
 pub struct LargeAllocator<'a, A: Allocator> {
     last_mapped_addr: usize, // open endpoint
     next_addr: usize,
     current_page: RcAlloc<Page, &'a A>,
-    addr2lmeta: HashMap<usize, LargeMeta<'a, A>, DefaultHashBuilder, &'a A>,
+    addr2lmeta: HashMap<usize, LargeMeta<'a, A>, BuildHasherDefault<FxHasher>, &'a A>,
     meta_alloc: &'a A,
 }
 
@@ -24,7 +26,11 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
             last_mapped_addr: first_addr,
             next_addr: first_addr,
             current_page: RcAlloc::new_in(Page(first_addr), meta_alloc),
-            addr2lmeta: HashMap::with_capacity_in(consts::RESV_ADDRS_NO, meta_alloc),
+            addr2lmeta: HashMap::with_capacity_and_hasher_in(
+                consts::RESV_ADDRS_NO,
+                BuildHasherDefault::<FxHasher>::default(),
+                meta_alloc,
+            ),
             meta_alloc,
         };
 
@@ -47,7 +53,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
                 consts::TANK_SIZE
             };
 
-            self.expand_mapped_region(expand_size);
+            self.expand_mapped_region(utils::align_up(expand_size, consts::PAGE_SIZE));
         }
 
         let next_page = RcAlloc::new_in(
@@ -57,7 +63,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
 
         self.addr2lmeta.insert(
             addr,
-            LargeMeta::new_in(size, self.current_page.clone(), next_page.clone()),
+            LargeMeta::new(size, self.current_page.clone(), next_page.clone()),
         );
 
         self.current_page = next_page;
@@ -66,7 +72,17 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
     }
 
     pub fn free(&mut self, addr: usize) {
-        let lmeta = self.addr2lmeta.get(&addr).unwrap();
+        let lmeta = self.addr2lmeta.remove(&addr);
+
+        if lmeta.is_none() {
+            if addr != 0 {
+                libc_eprintln!("Invalid or double free! addr: {}", addr);
+            }
+
+            return;
+        }
+
+        let lmeta = lmeta.unwrap();
 
         let first_page = if lmeta.first_page.count() == 1 {
             lmeta.first_page.0
@@ -84,17 +100,35 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
 
         if let Err(err) = unsafe { mman_wrapper::munmap(first_page, size) } {
             // TODO maybe handle mmap errors
-            eprintln!("Error with code: {}, when calling munmap!", err);
+            eprintln!(
+                "Error with code: {}, when calling munmap! addr: {}, size: {}",
+                err, first_page, size
+            );
             panic!("");
         }
+    }
 
-        self.addr2lmeta.remove(&addr);
+    // TODO see what to do with size, maybe actually get use to this function
+    pub fn usable_size(&self, addr: usize) -> usize {
+        match self.addr2lmeta.get(&addr) {
+            None => {
+                if addr != 0 {
+                    libc_eprintln!("Invalid or already freed address: {}", addr);
+                }
+
+                0
+            }
+            Some(lmeta) => lmeta.size,
+        }
     }
 
     fn expand_mapped_region(&mut self, size: usize) {
         if let Err(err) = unsafe { mman_wrapper::mmap(self.last_mapped_addr, size) } {
             // TODO maybe handle mmap errors
-            eprintln!("Error with code: {}, when calling mmap!", err);
+            eprintln!(
+                "Error with code: {}, when calling mmap! addr: {}, size: {}",
+                err, self.last_mapped_addr, size
+            );
             panic!("");
         }
 

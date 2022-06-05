@@ -10,7 +10,7 @@ pub struct LargeMeta<'a, A: Allocator> {
 }
 
 impl<'a, A: Allocator> LargeMeta<'a, A> {
-    pub fn new_in(
+    pub fn new(
         size: usize,
         first_page: RcAlloc<Page, &'a A>,
         second_page: RcAlloc<Page, &'a A>,

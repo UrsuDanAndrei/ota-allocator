@@ -10,13 +10,15 @@ use crate::metadata::thread_meta::small_allocator::small_meta::SmallMeta;
 use crate::utils::rc_alloc::RcAlloc;
 use core::alloc::Allocator;
 use core::cell::RefCell;
-use hashbrown::hash_map::DefaultHashBuilder;
+use core::hash::BuildHasherDefault;
 use hashbrown::HashMap;
+use libc_print::libc_eprintln;
+use rustc_hash::FxHasher;
 
 pub struct SmallAllocator<'a, A: Allocator> {
     pool_alloc: PoolAllocator,
     bins: [Bin<'a, A>; consts::BINS_NO],
-    addr2smeta: HashMap<usize, SmallMeta<'a, A>, DefaultHashBuilder, &'a A>,
+    addr2smeta: HashMap<usize, SmallMeta<'a, A>, BuildHasherDefault<FxHasher>, &'a A>,
     meta_alloc: &'a A,
 }
 
@@ -38,7 +40,11 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
                 10
             ],
             pool_alloc,
-            addr2smeta: HashMap::with_capacity_in(consts::RESV_ADDRS_NO, meta_alloc),
+            addr2smeta: HashMap::with_capacity_and_hasher_in(
+                consts::RESV_ADDRS_NO,
+                BuildHasherDefault::<FxHasher>::default(),
+                meta_alloc,
+            ),
             meta_alloc,
         }
     }
@@ -55,13 +61,31 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
         });
 
         self.addr2smeta
-            .insert(addr, SmallMeta::new(bin.pool.clone()));
+            .insert(addr, SmallMeta::new(size, bin.pool.clone()));
 
         addr
     }
 
     pub fn free(&mut self, addr: usize) {
-        self.addr2smeta.remove(&addr);
+        if self.addr2smeta.remove(&addr).is_none() {
+            if addr != 0 {
+                libc_eprintln!("Invalid or double free! addr: {}", addr);
+            }
+        }
+    }
+
+    // TODO see what to do with size, maybe actually get use to this function
+    pub fn usable_size(&self, addr: usize) -> usize {
+        match self.addr2smeta.get(&addr) {
+            None => {
+                if addr != 0 {
+                    libc_eprintln!("Invalid or already freed address: {}", addr);
+                }
+
+                0
+            }
+            Some(smeta) => smeta.size,
+        }
     }
 
     // TODO optimise this

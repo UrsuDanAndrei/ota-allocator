@@ -4,7 +4,7 @@
 #include <time.h>
 #include <sys/mman.h>
 #include <errno.h>
-#include <ota_allocator.h>
+//#include <ota_allocator.h>
 
 const int N = 2000000000;
 
@@ -23,26 +23,29 @@ void mmap_wrapper(void *addr, int size) {
 }
 
 int main() {
-	ota_init();
+//	ota_init();
 
 	time_t start = time(NULL);
+//	ota_init();
+//	for (int i = 0; i < 1; ++i) {
+//		char *s = malloc(/*i % 2048 + */32);
+//		strcpy(s, "rust rocks");
+//		free(s);
+////		printf("i: %d\n", i);
+//	}
+	char *s = malloc(24);
+	strcpy(s, "vxv");
+//	printf("p1: %p, p2: %p\n", s, s + 2);
+	printf("size is: %d\n", malloc_usable_size(s));
 
-	for (int i = 0; i < N; ++i) {
-		char *s = ota_malloc(/*i % 2048 + */32);
-		strcpy(s, "rust rocks");
-		ota_free(s);
-//		printf("i: %d\n", i);
-	}
+	char *ff = malloc(0);
+	printf("the addr: %p\n", ff);
 
 	time_t finish = time(NULL);
-
 
 	printf("Time elapsed: %lds\n", finish - start);
 
 	return 0;
 }
 
-//void *addr = 0x00008FFFFFFF0000;
-//int size = 4096;
-//
-//mmap_wrapper(addr, size);
+// run with RUSTFLAGS="-C target-cpu=native" cargo build --release && make clean && make && ./test

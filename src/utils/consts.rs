@@ -1,8 +1,8 @@
 // TODO figure out the proper value to use here
-pub const RESV_THREADS_NO: usize = 8;
+pub const RESV_THREADS_NO: usize = MAX_THREADS_NO;
 
 // TODO figure out the proper value to use here
-pub const RESV_ADDRS_NO: usize = 16;
+pub const RESV_ADDRS_NO: usize = 1024;
 
 // TODO make take this from the OS
 pub const PAGE_SIZE: usize = 4096;
@@ -37,14 +37,18 @@ pub const PAGE_SIZE: usize = 4096;
 // pub const META_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
 
 // values for 1TB max memory allocation, 128 max threads
+
+pub const MAX_THREADS_NO: usize = 128;
 pub const FIRST_ADDR_SPACE_START: usize = 0x0000_0300_0000_0000;
+pub const FIRST_ADDR_SPACE_ID: usize = FIRST_ADDR_SPACE_START >> ADDR_SPACE_BIT;
+pub const ADDR_SPACE_BIT: usize = 40;
 pub const ADDR_SPACE_MAX_SIZE: usize = 0x0000_0100_0000_0000;
 pub const ADDR_SPACE_MASK: usize = 0xFFFF_FF00_0000_0000;
 pub const LARGE_ADDR_SPACE_OFFSET: usize = 0x0000_0080_0000_0000;
 pub const LARGE_ADDR_SPACE_MASK: usize = 0x0000_0080_0000_0000;
 
 pub const META_ADDR_SPACE_START: usize = 0x0000_0200_0000_0000;
-pub const META_ADDR_SPACE_MAX_SIZE: usize = 32 * PAGE_SIZE;
+pub const META_ADDR_SPACE_MAX_SIZE: usize = 256 * TANK_SIZE;
 
 // TODO make this values configurable from the user
 pub const POOL_SIZE: usize = 2 * PAGE_SIZE;
