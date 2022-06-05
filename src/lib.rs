@@ -176,3 +176,6 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
     // TODO rewrite realloc function
     // TODO rewrite usable-malloc function
 }
+
+unsafe impl<'a, GA: GlobalAlloc> Send for OtaAllocator<'a, GA> {}
+unsafe impl<'a, GA: GlobalAlloc> Sync for OtaAllocator<'a, GA> {}
