@@ -34,6 +34,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
             meta_alloc,
         };
 
+        eprintln!("FIRST!!!!");
         large_alloc.expand_mapped_region(consts::TANK_SIZE);
 
         large_alloc
@@ -53,7 +54,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
                 consts::TANK_SIZE
             };
 
-            self.expand_mapped_region(expand_size);
+            self.expand_mapped_region(utils::align_up(expand_size, consts::PAGE_SIZE));
         }
 
         let next_page = RcAlloc::new_in(
@@ -75,7 +76,10 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
         let lmeta = self.addr2lmeta.remove(&addr);
 
         if lmeta.is_none() {
-            libc_eprintln!("Invalid or double free! addr: {}", addr);
+            if addr != 0 {
+                libc_eprintln!("Invalid or double free! addr: {}", addr);
+            }
+
             return;
         }
 
@@ -97,7 +101,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
 
         if let Err(err) = unsafe { mman_wrapper::munmap(first_page, size) } {
             // TODO maybe handle mmap errors
-            eprintln!("Error with code: {}, when calling munmap!", err);
+            eprintln!("Error with code: {}, when calling munmap! addr: {}, size: {}", err, first_page, size);
             panic!("");
         }
     }
@@ -106,7 +110,10 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
     pub fn usable_size(&self, addr: usize) -> usize {
         match self.addr2lmeta.get(&addr) {
             None => {
-                libc_eprintln!("Invalid or already freed address: {}", addr);
+                if addr != 0 {
+                    libc_eprintln!("Invalid or already freed address: {}", addr);
+                }
+
                 0
             },
             Some(lmeta) => lmeta.size,
@@ -114,9 +121,10 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
     }
 
     fn expand_mapped_region(&mut self, size: usize) {
+        eprintln!("BBBBBBBBBBBBBBBBb");
         if let Err(err) = unsafe { mman_wrapper::mmap(self.last_mapped_addr, size) } {
             // TODO maybe handle mmap errors
-            eprintln!("Error with code: {}, when calling mmap!", err);
+            eprintln!("Error with code: {}, when calling mmap! addr: {}, size: {}", err, self.last_mapped_addr, size);
             panic!("");
         }
 
