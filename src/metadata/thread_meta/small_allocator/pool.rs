@@ -37,7 +37,10 @@ impl Drop for Pool {
         // TODO find a way to test that this is actually called
         if let Err(err) = unsafe { mman_wrapper::munmap(self.start_addr, consts::POOL_SIZE) } {
             // TODO maybe handle mmap errors
-            eprintln!("Error with code: {}, when calling munmap!", err);
+            eprintln!(
+                "Error with code: {}, when calling munmap! addr: {}, size: POOL_SIZE",
+                err, self.start_addr
+            );
             panic!("");
         }
     }

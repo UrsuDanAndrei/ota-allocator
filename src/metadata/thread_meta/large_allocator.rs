@@ -34,7 +34,6 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
             meta_alloc,
         };
 
-        eprintln!("FIRST!!!!");
         large_alloc.expand_mapped_region(consts::TANK_SIZE);
 
         large_alloc
@@ -101,7 +100,10 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
 
         if let Err(err) = unsafe { mman_wrapper::munmap(first_page, size) } {
             // TODO maybe handle mmap errors
-            eprintln!("Error with code: {}, when calling munmap! addr: {}, size: {}", err, first_page, size);
+            eprintln!(
+                "Error with code: {}, when calling munmap! addr: {}, size: {}",
+                err, first_page, size
+            );
             panic!("");
         }
     }
@@ -115,16 +117,18 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
                 }
 
                 0
-            },
+            }
             Some(lmeta) => lmeta.size,
         }
     }
 
     fn expand_mapped_region(&mut self, size: usize) {
-        eprintln!("BBBBBBBBBBBBBBBBb");
         if let Err(err) = unsafe { mman_wrapper::mmap(self.last_mapped_addr, size) } {
             // TODO maybe handle mmap errors
-            eprintln!("Error with code: {}, when calling mmap! addr: {}, size: {}", err, self.last_mapped_addr, size);
+            eprintln!(
+                "Error with code: {}, when calling mmap! addr: {}, size: {}",
+                err, self.last_mapped_addr, size
+            );
             panic!("");
         }
 

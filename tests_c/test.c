@@ -33,9 +33,13 @@ int main() {
 //		free(s);
 ////		printf("i: %d\n", i);
 //	}
-	char *s = malloc(8);
+	char *s = malloc(24);
 	strcpy(s, "vxv");
+//	printf("p1: %p, p2: %p\n", s, s + 2);
 	printf("size is: %d\n", malloc_usable_size(s));
+
+	char *ff = malloc(0);
+	printf("the addr: %p\n", ff);
 
 	time_t finish = time(NULL);
 

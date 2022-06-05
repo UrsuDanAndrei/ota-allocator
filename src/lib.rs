@@ -65,13 +65,6 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
 
     // this function must be called EXACTLY once before using the allocator
     pub fn init(&'a mut self) {
-
-        // let i = 0;
-
-        // while i == 0 {
-        // unsafe { libc::usleep(15_000_000); }
-        // }
-
         self.meta = Some(RwLock::new(Metadata::new_in(
             consts::FIRST_ADDR_SPACE_START,
             &self.meta_alloc,
@@ -89,38 +82,27 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
         // TODO move this into a function
         match read_meta.get_addr_tmeta(addr) {
             None => {
+                if addr != 0 {
+                    eprintln!(
+                        "Invalid or double free, address from an unused address space! addr: {}",
+                        addr
+                    );
+                }
 
-                // if addr == 0 {
-                //     return;
-                // }
-
-                eprintln!("Invalid or double free, address from an unused address space! addr: {}", addr);
-                // panic!("");
                 0
             }
 
-            Some(addr_tmeta) => {
-                // eprintln!("BEFORE 1!!!!: {}", utils::get_current_tid());
-                let x = addr_tmeta.lock().usable_size(addr);
-                // eprintln!("AFTER 1!!!!: {}", utils::get_current_tid());
-                x
-            },
+            Some(addr_tmeta) => addr_tmeta.lock().usable_size(addr),
         }
     }
 
     fn read_meta(&self) -> RwLockReadGuard<Metadata<'a, AllocatorWrapper<GA>>> {
-        eprintln!("BEFPRE 4!!!!: {}", utils::get_current_tid());
-        let x = self.meta.as_ref().unwrap().read();
-        eprintln!("AFTER 4!!!!: {}", utils::get_current_tid());
-        x
+        self.meta.as_ref().unwrap().read()
     }
 
     fn write_meta(&self) -> RwLockWriteGuard<Metadata<'a, AllocatorWrapper<GA>>> {
         // getting the write lock trough an upgradeable read lock to avoid write starvation
-        eprintln!("BEFPRE 5!!!!: {}", utils::get_current_tid());
-        let x = self.meta.as_ref().unwrap().upgradeable_read().upgrade();
-        eprintln!("AFTER 5!!!!: {}", utils::get_current_tid());
-        x
+        self.meta.as_ref().unwrap().upgradeable_read().upgrade()
     }
 
     // TODO do a reset method, that brings the frees all memory and brings the allocator in the
@@ -129,8 +111,11 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
 
 unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
     unsafe fn alloc(&self, layout: Layout) -> *mut u8 {
-        // eprintln!("Allocated: {}", layout.size());
         let size = layout.size();
+
+        if size == 0 {
+            return 0 as *mut u8;
+        }
 
         if size == 1 {
             let x = 1;
@@ -142,7 +127,6 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
         // TODO move this into a function
         let tmeta = match read_meta.get_tmeta(tid) {
             None => {
-
                 // dropping the read lock earlier, so we can get the write lock
                 mem::drop(read_meta);
 
@@ -160,35 +144,27 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
             Some(tmeta) => tmeta,
         };
 
-        // eprintln!("BEFORE 2!!!!: {}", utils::get_current_tid());
         let addr = tmeta.lock().next_addr(size);
-        // eprintln!("AFTER 2!!!!: {}", utils::get_current_tid());
+
         addr as *mut u8
     }
 
     unsafe fn dealloc(&self, ptr: *mut u8, _layout: Layout) {
-        // eprintln!("Free: {}", ptr as usize);
         let addr = ptr as usize;
         let read_meta = self.read_meta();
 
         // TODO move this into a function
         match read_meta.get_addr_tmeta(addr) {
             None => {
+                if addr != 0 {
+                    eprintln!("Invalid or double free! addr here: {}", addr);
+                }
 
-                // if addr == 0 {
-                //     return;
-                // }
-
-                eprintln!("Invalid or double free! addr: {}", addr);
-                // panic!("");
                 return;
             }
 
             Some(addr_tmeta) => {
-                // eprintln!("BEFORE 3!!!!:");
-                let x = addr_tmeta.lock().free(addr);
-                // eprintln!("AFTER 3!!!!:");
-                x
+                addr_tmeta.lock().free(addr);
             }
         };
     }
@@ -197,8 +173,6 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
         self.alloc(layout)
     }
 
-    unsafe fn realloc(&self, ptr: *mut u8, layout: Layout, new_size: usize) -> *mut u8 {
-        self.dealloc(ptr, layout);
-        self.alloc(Layout::from_size_align_unchecked(new_size, layout.size()))
-    }
+    // TODO rewrite realloc function
+    // TODO rewrite usable-malloc function
 }

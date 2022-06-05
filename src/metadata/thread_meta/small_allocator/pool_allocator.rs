@@ -36,7 +36,10 @@ impl PoolAllocator {
     fn map_new_tank(&mut self) {
         if let Err(err) = unsafe { mman_wrapper::mmap(self.last_mapped_addr, consts::TANK_SIZE) } {
             // TODO maybe handle mmap errors
-            eprintln!("Error with code: {}, when calling mmap!", err);
+            eprintln!(
+                "Error with code: {}, when calling mmap! addr: {}, size: TANK_SIZE",
+                err, self.last_mapped_addr
+            );
             panic!("");
         }
 

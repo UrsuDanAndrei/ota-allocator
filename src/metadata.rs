@@ -10,11 +10,11 @@ pub use allocator_wrapper::AllocatorWrapper;
 use crate::utils::get_addr_space;
 use crate::utils::rc_alloc::RcAlloc;
 use crate::{consts, utils};
+use arr_macro;
 use hashbrown::HashMap;
 use rustc_hash::FxHasher;
 use spin::Mutex;
 use thread_meta::ThreadMeta;
-use arr_macro;
 
 pub struct Metadata<'a, A: Allocator> {
     next_addr_space_id: usize,

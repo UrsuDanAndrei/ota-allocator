@@ -68,7 +68,9 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
 
     pub fn free(&mut self, addr: usize) {
         if self.addr2smeta.remove(&addr).is_none() {
-            libc_eprintln!("Invalid or double free! addr: {}", addr);
+            if addr != 0 {
+                libc_eprintln!("Invalid or double free! addr: {}", addr);
+            }
         }
     }
 
@@ -76,9 +78,12 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
     pub fn usable_size(&self, addr: usize) -> usize {
         match self.addr2smeta.get(&addr) {
             None => {
-                libc_eprintln!("Invalid or already freed address: {}", addr);
+                if addr != 0 {
+                    libc_eprintln!("Invalid or already freed address: {}", addr);
+                }
+
                 0
-            },
+            }
             Some(smeta) => smeta.size,
         }
     }

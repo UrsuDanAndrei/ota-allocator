@@ -5,7 +5,7 @@ all: build
 build: test
 
 test: test.c
-	# YOU ALSO NEED TO export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/username/foo:/home/dan/workspace/licenta/ota-allocator/tests_c/../target/release
+	# YOU ALSO NEED TO export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/dan/workspace/licenta/ota-allocator/tests_c/../target/release
 	LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/home/dan/workspace/licenta/ota-allocator/tests_c/../target/release \
 	gcc test.c -o test \
 		-I../c_glue \
