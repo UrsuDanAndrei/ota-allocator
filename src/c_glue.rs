@@ -32,6 +32,35 @@ pub extern "C" fn ota_init() {
         ALLOCATOR.init();
     }
 }
+// use snmalloc_rs::SnMalloc;
+// use jemallocator::Jemalloc;
+//
+// type MetaAlloc = Jemalloc;
+
+// static mut ALLOCATOR: OtaAllocator<'static, MetaAlloc> = OtaAllocator::new_in(Jemalloc);
+// static IS_INIT: AtomicBool = AtomicBool::new(false);
+// static DONE_INIT: AtomicBool = AtomicBool::new(false);
+//
+// #[no_mangle]
+// pub extern "C" fn ota_init() {
+//     unsafe {
+//         if let Err(err) = mman_wrapper::mmap(
+//             consts::META_ADDR_SPACE_START,
+//             consts::META_ADDR_SPACE_MAX_SIZE,
+//         ) {
+//             eprintln!(
+//                 "Error with code: {}, when calling mmap for allocating heap memory!",
+//                 err
+//             );
+//             panic!("");
+//         }
+//         // ALLOCATOR.meta_alloc().lock().init(
+//         //     consts::META_ADDR_SPACE_START,
+//         //     consts::META_ADDR_SPACE_MAX_SIZE,
+//         // );
+//         ALLOCATOR.init();
+//     }
+// }
 
 #[no_mangle]
 pub extern "C" fn malloc(size: usize) -> *mut u8 {
@@ -91,7 +120,7 @@ pub extern "C" fn realloc(addr: *mut u8, size: usize) -> *mut u8 {
         // the align field is used to conform to the function signature, it is not used
         ALLOCATOR.realloc(
             addr,
-            Layout::from_size_align_unchecked(size, consts::STANDARD_ALIGN),
+            Layout::from_size_align_unchecked(ALLOCATOR.usable_size(addr), consts::STANDARD_ALIGN),
             size,
         )
     }
