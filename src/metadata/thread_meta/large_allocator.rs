@@ -82,7 +82,8 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
             return;
         }
 
-        let lmeta = lmeta.unwrap();
+        // SAFETY: the if above checks for None
+        let lmeta = unsafe { lmeta.unwrap_unchecked() };
 
         let first_page = if lmeta.first_page.count() == 1 {
             lmeta.first_page.0

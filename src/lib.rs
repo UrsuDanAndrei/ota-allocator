@@ -79,7 +79,6 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
         let addr = ptr as usize;
         let read_meta = self.read_meta();
 
-        // TODO move this into a function
         match read_meta.get_addr_tmeta(addr) {
             None => {
                 if addr != 0 {
@@ -97,12 +96,15 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
     }
 
     fn read_meta(&self) -> RwLockReadGuard<Metadata<'a, AllocatorWrapper<GA>>> {
-        self.meta.as_ref().unwrap().read()
+        // SAFETY: metadata is Some(_) after the init function is called
+        unsafe { self.meta.as_ref().unwrap_unchecked().read() }
     }
 
     fn write_meta(&self) -> RwLockWriteGuard<Metadata<'a, AllocatorWrapper<GA>>> {
         // getting the write lock trough an upgradeable read lock to avoid write starvation
-        self.meta.as_ref().unwrap().upgradeable_read().upgrade()
+
+        // SAFETY: metadata is Some(_) after the init function is called
+        unsafe { self.meta.as_ref().unwrap_unchecked().upgradeable_read().upgrade() }
     }
 
     // TODO do a reset method, that brings the frees all memory and brings the allocator in the
@@ -117,14 +119,9 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
             return 0 as *mut u8;
         }
 
-        if size == 1 {
-            let x = 1;
-        }
-
         let tid = utils::get_current_tid();
         let mut read_meta = self.read_meta();
 
-        // TODO move this into a function
         let tmeta = match read_meta.get_tmeta(tid) {
             None => {
                 // dropping the read lock earlier, so we can get the write lock
@@ -138,7 +135,9 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
 
                 // regaining the read lock
                 read_meta = self.read_meta();
-                read_meta.get_tmeta(tid).unwrap()
+
+                // SAFETY: the thread was just initialized in this None branch
+                unsafe { read_meta.get_tmeta(tid).unwrap_unchecked() }
             }
 
             Some(tmeta) => tmeta,
@@ -159,13 +158,9 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
                 if addr != 0 {
                     eprintln!("Invalid or double free! addr here: {}", addr);
                 }
-
-                return;
             }
 
-            Some(addr_tmeta) => {
-                addr_tmeta.lock().free(addr);
-            }
+            Some(addr_tmeta) => addr_tmeta.lock().free(addr)
         };
     }
 

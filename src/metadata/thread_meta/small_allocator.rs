@@ -57,7 +57,8 @@ impl<'a, A: Allocator> SmallAllocator<'a, A> {
         let addr = addr.unwrap_or_else(|| {
             bin.pool = RcAlloc::new_in(RefCell::new(self.pool_alloc.next_pool()), self.meta_alloc);
 
-            bin.pool.borrow_mut().next_addr(size).unwrap()
+            // SAFETY: a new pool always has enough space
+            unsafe { bin.pool.borrow_mut().next_addr(size).unwrap_unchecked() }
         });
 
         self.addr2smeta
