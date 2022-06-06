@@ -12,7 +12,6 @@ pub mod c_glue;
 mod metadata;
 mod utils;
 
-use alloc::boxed::Box;
 // reexports
 pub use consts::{META_ADDR_SPACE_MAX_SIZE, META_ADDR_SPACE_START};
 
@@ -23,8 +22,8 @@ pub use consts::{POOL_SIZE, TANK_SIZE, TEST_ADDR_SPACE_MAX_SIZE, TEST_ADDR_SPACE
 pub use utils::mman_wrapper;
 
 use core::alloc::{GlobalAlloc, Layout};
-use core::{mem, panic};
-use libc_print::std_name::*;
+use core::mem;
+use libc_print::libc_eprintln;
 use metadata::{AllocatorWrapper, Metadata};
 use spin::{RwLock, RwLockReadGuard, RwLockWriteGuard};
 use utils::consts;
@@ -82,7 +81,7 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
         match read_meta.get_addr_tmeta(addr) {
             None => {
                 if addr != 0 {
-                    eprintln!(
+                    libc_eprintln!(
                         "Invalid or double free, address from an unused address space! addr: {}",
                         addr
                     );
@@ -104,7 +103,13 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
         // getting the write lock trough an upgradeable read lock to avoid write starvation
 
         // SAFETY: metadata is Some(_) after the init function is called
-        unsafe { self.meta.as_ref().unwrap_unchecked().upgradeable_read().upgrade() }
+        unsafe {
+            self.meta
+                .as_ref()
+                .unwrap_unchecked()
+                .upgradeable_read()
+                .upgrade()
+        }
     }
 
     // TODO do a reset method, that brings the frees all memory and brings the allocator in the
@@ -156,11 +161,11 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
         match read_meta.get_addr_tmeta(addr) {
             None => {
                 if addr != 0 {
-                    eprintln!("Invalid or double free! addr here: {}", addr);
+                    libc_eprintln!("Invalid or double free! addr here: {}", addr);
                 }
             }
 
-            Some(addr_tmeta) => addr_tmeta.lock().free(addr)
+            Some(addr_tmeta) => addr_tmeta.lock().free(addr),
         };
     }
 

@@ -1,4 +1,4 @@
-use libc_print::std_name::eprintln;
+use libc_print::libc_eprintln;
 
 use crate::metadata::thread_meta::small_allocator::pool::Pool;
 use crate::{consts, utils::mman_wrapper};
@@ -36,9 +36,10 @@ impl PoolAllocator {
     fn map_new_tank(&mut self) {
         if let Err(err) = unsafe { mman_wrapper::mmap(self.last_mapped_addr, consts::TANK_SIZE) } {
             // TODO maybe handle mmap errors
-            eprintln!(
+            libc_eprintln!(
                 "Error with code: {}, when calling mmap! addr: {}, size: TANK_SIZE",
-                err, self.last_mapped_addr
+                err,
+                self.last_mapped_addr
             );
             panic!("");
         }

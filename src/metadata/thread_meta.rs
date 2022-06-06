@@ -5,7 +5,6 @@ use crate::metadata::thread_meta::large_allocator::LargeAllocator;
 use crate::metadata::thread_meta::small_allocator::SmallAllocator;
 use crate::{consts, utils};
 use core::alloc::Allocator;
-use libc_print::libc_eprintln;
 
 pub struct ThreadMeta<'a, A: Allocator> {
     small_alloc: SmallAllocator<'a, A>,

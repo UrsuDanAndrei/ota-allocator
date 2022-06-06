@@ -7,7 +7,6 @@ use core::hash::BuildHasherDefault;
 // reexports
 pub use allocator_wrapper::AllocatorWrapper;
 
-use crate::utils::get_addr_space;
 use crate::utils::rc_alloc::RcAlloc;
 use crate::{consts, utils};
 use arr_macro;
@@ -19,7 +18,6 @@ use thread_meta::ThreadMeta;
 pub struct Metadata<'a, A: Allocator> {
     next_addr_space_id: usize,
     // TODO erase this value
-    next_addr_space: usize,
     addr_space2tmeta: [Option<RcAlloc<Mutex<ThreadMeta<'a, A>>, &'a A>>; consts::MAX_THREADS_NO],
     tid2tmeta: HashMap<
         usize,
@@ -37,7 +35,6 @@ impl<'a, A: Allocator> Metadata<'a, A> {
 
         Metadata {
             next_addr_space_id: consts::FIRST_ADDR_SPACE_ID,
-            next_addr_space: first_addr_space,
             addr_space2tmeta: arr_macro::arr![None; 128],
             tid2tmeta: HashMap::with_capacity_and_hasher_in(
                 consts::RESV_THREADS_NO,

@@ -7,7 +7,6 @@ use core::alloc::Allocator;
 use core::hash::BuildHasherDefault;
 use hashbrown::HashMap;
 use libc_print::libc_eprintln;
-use libc_print::std_name::eprintln;
 use rustc_hash::FxHasher;
 
 pub struct LargeAllocator<'a, A: Allocator> {
@@ -101,9 +100,11 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
 
         if let Err(err) = unsafe { mman_wrapper::munmap(first_page, size) } {
             // TODO maybe handle mmap errors
-            eprintln!(
+            libc_eprintln!(
                 "Error with code: {}, when calling munmap! addr: {}, size: {}",
-                err, first_page, size
+                err,
+                first_page,
+                size
             );
             panic!("");
         }
@@ -126,9 +127,11 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
     fn expand_mapped_region(&mut self, size: usize) {
         if let Err(err) = unsafe { mman_wrapper::mmap(self.last_mapped_addr, size) } {
             // TODO maybe handle mmap errors
-            eprintln!(
+            libc_eprintln!(
                 "Error with code: {}, when calling mmap! addr: {}, size: {}",
-                err, self.last_mapped_addr, size
+                err,
+                self.last_mapped_addr,
+                size
             );
             panic!("");
         }

@@ -1,6 +1,6 @@
 use buddy_system_allocator::LockedHeap;
 use core::alloc::{GlobalAlloc, Layout};
-use libc_print::std_name::eprintln;
+use libc_print::libc_eprintln;
 use ota_allocator::{mman_wrapper, OtaAllocator};
 use spin::Once;
 
@@ -96,7 +96,7 @@ unsafe fn init_buddy_allocator(
     addr_space_size: usize,
 ) {
     if let Err(err) = mman_wrapper::mmap(addr_space_start, addr_space_size) {
-        eprintln!(
+        libc_eprintln!(
             "Error with code: {}, when calling mmap for allocating heap memory!",
             err
         );

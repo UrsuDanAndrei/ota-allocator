@@ -1,6 +1,3 @@
-use core::panic::PanicInfo;
-use libc_print::libc_eprintln;
-
 pub mod consts;
 pub mod mman_wrapper;
 pub mod rc_alloc;

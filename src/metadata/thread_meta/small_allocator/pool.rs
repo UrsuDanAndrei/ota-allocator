@@ -1,6 +1,6 @@
 use crate::utils::align_up;
 use crate::{consts, utils::mman_wrapper};
-use libc_print::std_name::eprintln;
+use libc_print::libc_eprintln;
 
 // TODO maybe make POOL_SIZE a const type parameter
 pub struct Pool {
@@ -37,9 +37,10 @@ impl Drop for Pool {
         // TODO find a way to test that this is actually called
         if let Err(err) = unsafe { mman_wrapper::munmap(self.start_addr, consts::POOL_SIZE) } {
             // TODO maybe handle mmap errors
-            eprintln!(
+            libc_eprintln!(
                 "Error with code: {}, when calling munmap! addr: {}, size: POOL_SIZE",
-                err, self.start_addr
+                err,
+                self.start_addr
             );
             panic!("");
         }

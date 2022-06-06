@@ -1,18 +1,13 @@
 use crate::{consts, utils::mman_wrapper, OtaAllocator};
 use core::alloc::{GlobalAlloc, Layout};
 use core::sync::atomic::{AtomicBool, Ordering};
-use lazy_static::lazy_static;
-use libc_print::std_name::eprintln;
 
 // use buddy_system_allocator::LockedHeap;
 //
 // // FIXME, figure out the proper ORDER value here, using 32 for now
 // const BUDDY_ALLOCATOR_ORDER: usize = 32;
 // type MetaAlloc = LockedHeap<{ BUDDY_ALLOCATOR_ORDER }>;
-//
 // pub static mut ALLOCATOR: OtaAllocator<'static, MetaAlloc> = OtaAllocator::new_in(MetaAlloc::new());
-// pub static IS_INIT: AtomicBool = AtomicBool::new(false);
-// pub static DONE_INIT: AtomicBool = AtomicBool::new(false);
 //
 // #[no_mangle]
 // #[inline(always)]
@@ -43,35 +38,31 @@ use libc_print::std_name::eprintln;
 //         while !DONE_INIT.load(Ordering::Relaxed) {}
 //     }
 // }
-
+//
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+//
 // use snmalloc_rs::SnMalloc;
-//
 // type MetaAlloc = SnMalloc;
-//
 // pub(crate) static mut ALLOCATOR: OtaAllocator<'static, MetaAlloc> = OtaAllocator::new_in(SnMalloc);
-// pub static IS_INIT: AtomicBool = AtomicBool::new(false);
-// pub static DONE_INIT: AtomicBool = AtomicBool::new(false);
 //
-// #[no_mangle]
-// #[inline(always)]
-// pub extern "C" fn ota_init() {
-//     if !DONE_INIT.load(Ordering::Relaxed) {
-//         if !IS_INIT.swap(true, Ordering::Relaxed) {
-//             unsafe {
-//                 ALLOCATOR.init();
-//             }
-//             DONE_INIT.store(true, Ordering::Relaxed);
-//         }
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
 //
-//         while !DONE_INIT.load(Ordering::Relaxed) {}
-//     }
-// }
-
 use mimalloc::MiMalloc;
-
 type MetaAlloc = MiMalloc;
-
 pub static mut ALLOCATOR: OtaAllocator<'static, MetaAlloc> = OtaAllocator::new_in(MiMalloc);
+//
+// =================================================================================================
+// =================================================================================================
+// =================================================================================================
+//
+// use hoard_sys::Jemalloc;
+// type MetaAlloc = Jemalloc;
+// pub static mut ALLOCATOR: OtaAllocator<'static, MetaAlloc> = OtaAllocator::new_in(Jemalloc);
+
 pub static IS_INIT: AtomicBool = AtomicBool::new(false);
 pub static DONE_INIT: AtomicBool = AtomicBool::new(false);
 
