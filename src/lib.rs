@@ -81,10 +81,10 @@ impl<'a, GA: GlobalAlloc> OtaAllocator<'a, GA> {
         match read_meta.get_addr_tmeta(addr) {
             None => {
                 if addr != 0 {
-                    libc_eprintln!(
-                        "Invalid or double free, address from an unused address space! addr: {}",
-                        addr
-                    );
+                    // libc_eprintln!(
+                    //     "Invalid or double free, address from an unused address space! addr: {}",
+                    //     addr
+                    // );
                 }
 
                 0
@@ -161,7 +161,7 @@ unsafe impl<'a, GA: GlobalAlloc> GlobalAlloc for OtaAllocator<'a, GA> {
         match read_meta.get_addr_tmeta(addr) {
             None => {
                 if addr != 0 {
-                    libc_eprintln!("Invalid or double free! addr here: {}", addr);
+                    // libc_eprintln!("Invalid or double free! addr here: {}", addr);
                 }
             }
 

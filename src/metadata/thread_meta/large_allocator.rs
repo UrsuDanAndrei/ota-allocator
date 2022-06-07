@@ -75,7 +75,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
 
         if lmeta.is_none() {
             if addr != 0 {
-                libc_eprintln!("Invalid or double free! addr: {}", addr);
+                // libc_eprintln!("Invalid or double free! addr: {}", addr);
             }
 
             return;
@@ -115,7 +115,7 @@ impl<'a, A: Allocator> LargeAllocator<'a, A> {
         match self.addr2lmeta.get(&addr) {
             None => {
                 if addr != 0 {
-                    libc_eprintln!("Invalid or already freed address: {}", addr);
+                    // libc_eprintln!("Invalid or already freed address: {}", addr);
                 }
 
                 0

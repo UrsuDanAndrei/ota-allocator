@@ -30,6 +30,7 @@ rustc-hash = { version = "1.1.0", default-features = false }
 snmalloc-rs = "0.3.0"
 mimalloc = { version = "0.1.29" }
 #jemallocator = "0.5.0"
+libc_alloc = "1.0.3"
 
 [dev-dependencies]
 spin = { version = "0.9.2", default-features = false, features = ["mutex", "spin_mutex", "rwlock", "once"] }

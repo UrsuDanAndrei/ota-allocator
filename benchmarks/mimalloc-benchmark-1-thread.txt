@@ -1,0 +1,2193 @@
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  dh
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       dh    0:28.18 7660 28.17 0.00 29 769
+
+---- 1: espresso
+
+run 1: espresso dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./espresso ../../bench/espresso/largest.espresso
+espresso    dh    0:13.20 8060 13.19 0.00 5 871
+
+---- 1: barnes
+
+run 1: barnes dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./barnes
+barnes      dh    0:02.55 64872 2.52 0.02 2 16477
+
+---- 1: redis
+
+run 1: redis dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis dh: ops/sec: 52186.62, relative time: 38.323s
+redis       dh    0:38.323 52876 18.72 0.46 1 12976
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       dh    5:25.38 797240 324.85 2.08 0 371041
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,dh, relative time: 650.206s
+larsonN-sized dh    0:650.206 12484 4.99 0.02 0 2120
+
+---- 1: mstressN
+
+run 1: mstressN dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./mstress 1 50 25
+mstressN    dh    0:00.15 10396 0.13 0.02 0 10387
+
+---- 1: rptestN
+
+run 1: rptestN dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,dh: ops/sec: 1644737, relative time: 1.215s
+rptestN     dh    0:1.215 12876 0.26 0.16 2 2206
+
+---- 1: gs
+
+run 1: gs dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          dh    0:01.58 65560 1.34 0.20 168 84244
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./alloc-test 1
+threads: 1
+alloc-test1 dh    0:25.37 20208 25.36 0.00 0 4362
+
+---- 1: sh6benchN
+
+run 1: sh6benchN dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./sh6bench 2
+sh6benchN   dh    3:07.38 713740 178.97 132.77 0 197770
+
+---- 1: sh8benchN
+
+run 1: sh8benchN dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./sh8bench 2
+sh8benchN   dh    5:09.20 173512 299.84 230.45 0 161308
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,dh, relative time: 45.257s
+xmalloc-testN dh    0:45.257 7580 4.94 3.20 1 713
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 dh    0:01.60 5588 1.60 0.00 0 305
+
+---- 1: glibc-simple
+
+run 1: glibc-simple dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./glibc-simple
+glibc-simple dh    0:19.21 5840 19.17 0.03 0 373
+
+---- 1: larsonN
+
+run 1: larsonN dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,dh, relative time: 544.239s
+larsonN     dh    0:544.239 12644 5.01 0.00 0 2128
+
+---- 1: malloc-large
+
+run 1: malloc-large dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./malloc-large
+malloc-large dh    0:20.82 414636 12.02 8.80 0 7746382
+
+---- 1: mleak10
+
+run 1: mleak10 dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./mleak 5
+mleak10     dh    0:00.07 6084 0.02 0.08 0 6389
+
+---- 1: mleak100
+
+run 1: mleak100 dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./mleak 50
+mleak100    dh    0:00.70 6080 0.16 0.87 0 60390
+
+---- 1: rbstress1
+
+run 1: rbstress1 dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+rbstress1   dh    0:06.57 273200 6.29 0.24 41 168301
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 dh: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/dh/src/libdieharder.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 dh    0:01.80 5724 1.80 0.00 0 297
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       dh    28.18 7660 28.17 0.00 29 769
+      
+espresso    dh    13.20 8060 13.19 0.00 5 871
+      
+barnes      dh    02.55 64872 2.52 0.02 2 16477
+      
+redis       dh    38.323 52876 18.72 0.46 1 12976
+      
+leanN       dh    5:25.38 797240 324.85 2.08 0 371041
+      
+larsonN-sized dh    650.206 12484 4.99 0.02 0 2120
+      
+mstressN    dh    00.15 10396 0.13 0.02 0 10387
+      
+rptestN     dh    1.215 12876 0.26 0.16 2 2206
+      
+gs          dh    01.58 65560 1.34 0.20 168 84244
+      
+alloc-test1 dh    25.37 20208 25.36 0.00 0 4362
+      
+sh6benchN   dh    3:07.38 713740 178.97 132.77 0 197770
+      
+sh8benchN   dh    5:09.20 173512 299.84 230.45 0 161308
+      
+xmalloc-testN dh    45.257 7580 4.94 3.20 1 713
+      
+cache-scratch1 dh    01.60 5588 1.60 0.00 0 305
+      
+glibc-simple dh    19.21 5840 19.17 0.03 0 373
+      
+larsonN     dh    544.239 12644 5.01 0.00 0 2128
+      
+malloc-large dh    20.82 414636 12.02 8.80 0 7746382
+      
+mleak10     dh    00.07 6084 0.02 0.08 0 6389
+      
+mleak100    dh    00.70 6080 0.16 0.87 0 60390
+      
+rbstress1   dh    06.57 273200 6.29 0.24 41 168301
+      
+cache-thrash1 dh    01.80 5724 1.80 0.00 0 297
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+FF
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  ff
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       ff    0:06.49 250184 5.84 0.65 0 669378
+
+---- 1: espresso
+
+run 1: espresso ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./espresso ../../bench/espresso/largest.espresso
+espresso    ff    0:05.91 40928 5.02 0.88 0 944674
+
+---- 1: barnes
+
+run 1: barnes ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./barnes
+barnes      ff    0:02.46 95304 2.44 0.01 0 24863
+
+---- 1: redis
+
+run 1: redis ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis ff: ops/sec: 352858.12, relative time: 5.668s
+redis       ff    0:5.668 122956 2.38 0.48 0 135499
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       ff    1:14.49 3300828 69.27 5.25 0 4027425
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,ff, relative time: 247.048s
+larsonN-sized ff    0:247.048 108440 1.76 3.25 0 2754799
+
+---- 1: mstressN
+
+run 1: mstressN ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./mstress 1 50 25
+mstressN    ff    0:00.09 38516 0.05 0.04 0 33046
+
+---- 1: rptestN
+
+run 1: rptestN ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,ff: ops/sec: 1738824, relative time: 1.150s
+rptestN     ff    0:1.150 42220 0.11 0.31 0 99653
+
+---- 1: gs
+
+run 1: gs ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          ff    0:02.17 122860 1.23 0.93 0 1033639
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./alloc-test 1
+threads: 1
+alloc-test1 ff    0:06.90 747776 6.19 0.70 0 411585
+
+---- 1: sh6benchN
+
+run 1: sh6benchN ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./sh6bench 2
+sh6benchN   ff    0:05.00 843216 6.61 2.24 0 1400849
+
+---- 1: sh8benchN
+
+run 1: sh8benchN ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./sh8bench 2
+sh8benchN   ff    0:13.50 175752 15.18 8.39 0 6018977
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,ff, relative time: 4.150s
+xmalloc-testN ff    0:4.150 69248 5.50 3.03 0 2132825
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 ff    0:01.72 77204 1.71 0.01 0 18730
+
+---- 1: glibc-simple
+
+run 1: glibc-simple ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./glibc-simple
+glibc-simple ff    0:04.79 39248 3.90 0.87 0 883998
+
+---- 1: larsonN
+
+run 1: larsonN ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,ff, relative time: 250.992s
+larsonN     ff    0:250.992 108224 1.94 3.07 0 2711776
+
+---- 1: malloc-large
+
+run 1: malloc-large ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./malloc-large
+malloc-large ff    0:11.17 484700 1.31 9.85 0 7764342
+
+---- 1: mleak10
+
+run 1: mleak10 ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./mleak 5
+mleak10     ff    0:00.74 73948 0.05 0.92 0 659193
+
+---- 1: mleak100
+
+run 1: mleak100 ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./mleak 50
+mleak100    ff    0:07.53 390308 0.35 9.53 0 6509202
+
+---- 1: rbstress1
+
+run 1: rbstress1 ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+[BUG] transient_heap_block_alloc: failed
+
+ruby 2.7.0p0 (2019-12-25 revision 647ee6f091) [x86_64-linux-gnu]
+
+-- Control frame information -----------------------------------------------
+c:0001 p:---- s:0003 e:000002 (none) [FINISH]
+
+
+-- C level backtrace information -------------------------------------------
+/lib/x86_64-linux-gnu/libruby-2.7.so.2.7(0x7f470fd9a0a9) [0x7f470fd9a0a9]
+/lib/x86_64-linux-gnu/libruby-2.7.so.2.7(0x7f470fd9a82b) [0x7f470fd9a82b]
+/lib/x86_64-linux-gnu/libruby-2.7.so.2.7(rb_bug+0xeb) [0x7f470fb970ec]
+/lib/x86_64-linux-gnu/libruby-2.7.so.2.7(0x7f470fb995c0) [0x7f470fb995c0]
+/lib/x86_64-linux-gnu/libruby-2.7.so.2.7(0x7f470fc410ed) [0x7f470fc410ed]
+/lib/x86_64-linux-gnu/libruby-2.7.so.2.7(ruby_setup+0xf4) [0x7f470fc1a814]
+/lib/x86_64-linux-gnu/libruby-2.7.so.2.7(ruby_init+0xd) [0x7f470fc1c77d]
+ruby(0x5628543b916a) [0x5628543b916a]
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main+0xf3) [0x7f470f9a10b3] ../csu/libc-start.c:308
+/lib/x86_64-linux-gnu/libc.so.6(__libc_start_main) (null):0
+ruby(_start+0x2e) [0x5628543b91ce]
+
+-- Other runtime information -----------------------------------------------
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 ff: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ff/libffmallocnpmt.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 ff    0:01.47 77268 1.45 0.02 0 18736
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cache-thrash1 ff    01.47 77268 1.45 0.02 0 18736
+
+
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+gd
+
+
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  gd
+tests     :  cfrac espresso barnes lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       gd    0:11.88 248996 11.77 0.10 0 61623
+
+---- 1: espresso
+
+run 1: espresso gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./espresso ../../bench/espresso/largest.espresso
+espresso    gd    0:07.55 281680 7.42 0.12 0 70775
+
+---- 1: barnes
+
+run 1: barnes gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./barnes
+barnes      gd    0:02.79 61212 2.76 0.03 0 16043
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       gd    2:01.14 993840 119.42 1.77 0 1099155
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,gd, relative time: 121.790s
+larsonN-sized gd    0:121.790 740176 4.75 0.30 0 185984
+
+---- 1: mstressN
+
+run 1: mstressN gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./mstress 1 50 25
+mstressN    gd    0:00.09 18000 0.05 0.03 0 14944
+
+---- 1: rptestN
+
+run 1: rptestN gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,gd: ops/sec: 2725009, relative time: .733s
+rptestN     gd    0:.733 72608 0.16 0.21 0 17543
+
+---- 1: gs
+
+run 1: gs gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          gd    0:01.41 106696 1.23 0.17 0 117478
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./alloc-test 1
+threads: 1
+alloc-test1 gd    0:08.97 392680 8.79 0.17 0 97847
+
+---- 1: sh6benchN
+
+run 1: sh6benchN gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./sh6bench 2
+sh6benchN   gd    0:08.43 1363376 16.19 0.55 0 343113
+
+---- 1: sh8benchN
+
+run 1: sh8benchN gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./sh8bench 2
+sh8benchN   gd    0:29.10 1432568 56.32 1.71 0 710421
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,gd, relative time: 12.857s
+xmalloc-testN gd    0:12.857 5643104 5.28 2.22 0 1517038
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 gd    0:01.78 5420 1.77 0.00 0 629
+
+---- 1: glibc-simple
+
+run 1: glibc-simple gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./glibc-simple
+glibc-simple gd    0:07.40 393496 7.29 0.10 0 97828
+
+---- 1: larsonN
+
+run 1: larsonN gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,gd, relative time: 121.863s
+larsonN     gd    0:121.863 740184 4.77 0.28 0 185904
+
+---- 1: malloc-large
+
+run 1: malloc-large gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./malloc-large
+malloc-large gd    0:11.68 411904 1.43 10.24 0 7746085
+
+---- 1: mleak10
+
+run 1: mleak10 gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./mleak 5
+mleak10     gd    0:00.05 7220 0.00 0.09 0 1198
+
+---- 1: mleak100
+
+run 1: mleak100 gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./mleak 50
+mleak100    gd    0:00.59 7844 0.15 0.75 0 1375
+
+---- 1: rbstress1
+
+run 1: rbstress1 gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 gd: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/gd/libguarder.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 gd    0:01.43 5128 1.43 0.00 0 611
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cache-thrash1 gd    01.43 5128 1.43 0.00 0 611
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+hm
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  hm
+tests     :  cfrac espresso barnes redis larson-sized mstress rptest gs alloc-test sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       hm    0:09.81 6412 9.81 0.00 0 1078
+
+---- 1: espresso
+
+run 1: espresso hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./espresso ../../bench/espresso/largest.espresso
+espresso    hm    0:08.14 21452 8.11 0.03 0 8526
+
+---- 1: barnes
+
+run 1: barnes hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./barnes
+barnes      hm    0:02.77 60396 2.76 0.01 0 15885
+
+---- 1: redis
+
+run 1: redis hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis hm: ops/sec: 229832.23, relative time: 8.701s
+redis       hm    0:8.701 51812 4.02 0.36 0 21242
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,hm, relative time: 248.971s
+larsonN-sized hm    0:248.971 47820 4.95 0.07 0 19099
+
+---- 1: mstressN
+
+run 1: mstressN hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./mstress 1 50 25
+mstressN    hm    0:00.12 37144 0.06 0.05 0 20837
+
+---- 1: rptestN
+
+run 1: rptestN hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,hm: ops/sec: 2077478, relative time: .962s
+rptestN     hm    0:.962 31372 0.20 0.19 0 12590
+
+---- 1: gs
+
+run 1: gs hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          hm    0:01.56 43596 1.33 0.23 0 90059
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./alloc-test 1
+threads: 1
+alloc-test1 hm    0:10.54 21540 10.53 0.00 0 6569
+
+---- 1: sh8benchN
+
+run 1: sh8benchN hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./sh8bench 2
+sh8benchN   hm    0:38.01 151668 43.35 33.40 0 3570241
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,hm, relative time: 50.408s
+xmalloc-testN hm    0:50.408 41608 5.40 4.11 0 14472
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 hm    0:01.84 4680 1.81 0.00 0 492
+
+---- 1: glibc-simple
+
+run 1: glibc-simple hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./glibc-simple
+glibc-simple hm    0:08.15 6904 8.05 0.01 0 1285
+
+---- 1: larsonN
+
+run 1: larsonN hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,hm, relative time: 257.103s
+larsonN     hm    0:257.103 47852 4.95 0.03 0 18856
+
+---- 1: malloc-large
+
+run 1: malloc-large hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./malloc-large
+malloc-large hm    0:11.81 411244 1.22 10.56 0 7745961
+
+---- 1: mleak10
+
+run 1: mleak10 hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./mleak 5
+mleak10     hm    0:00.08 5580 0.01 0.10 0 6974
+
+---- 1: mleak100
+
+run 1: mleak100 hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./mleak 50
+mleak100    hm    0:00.78 6592 0.14 1.01 0 61335
+
+---- 1: rbstress1
+
+run 1: rbstress1 hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+rbstress1   hm    0:05.11 150932 4.79 0.32 0 132990
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 hm: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out/libhardened_malloc.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 hm    0:01.81 4716 1.81 0.00 0 491
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       hm    09.81 6412 9.81 0.00 0 1078
+      
+espresso    hm    08.14 21452 8.11 0.03 0 8526
+      
+barnes      hm    02.77 60396 2.76 0.01 0 15885
+      
+redis       hm    8.701 51812 4.02 0.36 0 21242
+      
+larsonN-sized hm    248.971 47820 4.95 0.07 0 19099
+      
+mstressN    hm    00.12 37144 0.06 0.05 0 20837
+      
+rptestN     hm    .962 31372 0.20 0.19 0 12590
+      
+gs          hm    01.56 43596 1.33 0.23 0 90059
+      
+alloc-test1 hm    10.54 21540 10.53 0.00 0 6569
+      
+sh8benchN   hm    38.01 151668 43.35 33.40 0 3570241
+      
+xmalloc-testN hm    50.408 41608 5.40 4.11 0 14472
+      
+cache-scratch1 hm    01.84 4680 1.81 0.00 0 492
+      
+glibc-simple hm    08.15 6904 8.05 0.01 0 1285
+      
+larsonN     hm    257.103 47852 4.95 0.03 0 18856
+      
+malloc-large hm    11.81 411244 1.22 10.56 0 7745961
+      
+mleak10     hm    00.08 5580 0.01 0.10 0 6974
+      
+mleak100    hm    00.78 6592 0.14 1.01 0 61335
+      
+rbstress1   hm    05.11 150932 4.79 0.32 0 132990
+      
+cache-thrash1 hm    01.81 4716 1.81 0.00 0 491
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+hml
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  hml
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       hml   0:06.63 4408 6.62 0.00 2 538
+
+---- 1: espresso
+
+run 1: espresso hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./espresso ../../bench/espresso/largest.espresso
+espresso    hml   0:06.00 4528 5.91 0.07 0 18188
+
+---- 1: barnes
+
+run 1: barnes hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./barnes
+barnes      hml   0:02.79 59508 2.77 0.02 0 15699
+
+---- 1: redis
+
+run 1: redis hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis hml: ops/sec: 287438.91, relative time: 6.958s
+redis       hml   0:6.958 38984 3.10 0.39 0 9739
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       hml   1:17.59 421704 75.72 1.83 0 381738
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,hml, relative time: 106.989s
+larsonN-sized hml   0:106.989 12456 4.88 0.11 0 50907
+
+---- 1: mstressN
+
+run 1: mstressN hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./mstress 1 50 25
+mstressN    hml   0:00.07 11524 0.04 0.03 0 12622
+
+---- 1: rptestN
+
+run 1: rptestN hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,hml: ops/sec: 4296689, relative time: .465s
+rptestN     hml   0:.465 7916 0.14 0.19 0 3212
+
+---- 1: gs
+
+run 1: gs hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          hml   0:01.49 38824 1.26 0.22 0 88357
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./alloc-test 1
+threads: 1
+alloc-test1 hml   0:06.89 12684 6.87 0.00 0 2796
+
+---- 1: sh6benchN
+
+run 1: sh6benchN hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./sh6bench 2
+sh6benchN   hml   0:04.19 349724 8.18 0.17 0 86777
+
+---- 1: sh8benchN
+
+run 1: sh8benchN hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./sh8bench 2
+sh8benchN   hml   0:31.86 135980 27.72 36.08 0 4944776
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,hml, relative time: 39.682s
+xmalloc-testN hml   0:39.682 18452 5.91 3.92 0 22463
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 hml   0:01.69 3908 1.68 0.00 0 269
+
+---- 1: glibc-simple
+
+run 1: glibc-simple hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./glibc-simple
+glibc-simple hml   0:05.09 3724 5.08 0.00 0 391
+
+---- 1: larsonN
+
+run 1: larsonN hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,hml, relative time: 107.826s
+larsonN     hml   0:107.826 12408 4.85 0.14 0 50389
+
+---- 1: malloc-large
+
+run 1: malloc-large hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./malloc-large
+malloc-large hml   0:11.46 410576 1.22 10.23 0 7745780
+
+---- 1: mleak10
+
+run 1: mleak10 hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./mleak 5
+mleak10     hml   0:00.08 3664 0.00 0.11 0 6317
+
+---- 1: mleak100
+
+run 1: mleak100 hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./mleak 50
+mleak100    hml   0:00.77 3684 0.10 1.02 0 60319
+
+---- 1: rbstress1
+
+run 1: rbstress1 hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+rbstress1   hml   0:04.20 140024 4.00 0.19 0 126451
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 hml: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/hm/out-light/libhardened_malloc-light.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 hml   0:01.77 3888 1.77 0.00 0 268
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       hml   06.63 4408 6.62 0.00 2 538
+      
+espresso    hml   06.00 4528 5.91 0.07 0 18188
+      
+barnes      hml   02.79 59508 2.77 0.02 0 15699
+      
+redis       hml   6.958 38984 3.10 0.39 0 9739
+      
+leanN       hml   1:17.59 421704 75.72 1.83 0 381738
+      
+larsonN-sized hml   106.989 12456 4.88 0.11 0 50907
+      
+mstressN    hml   00.07 11524 0.04 0.03 0 12622
+      
+rptestN     hml   .465 7916 0.14 0.19 0 3212
+      
+gs          hml   01.49 38824 1.26 0.22 0 88357
+      
+alloc-test1 hml   06.89 12684 6.87 0.00 0 2796
+      
+sh6benchN   hml   04.19 349724 8.18 0.17 0 86777
+      
+sh8benchN   hml   31.86 135980 27.72 36.08 0 4944776
+      
+xmalloc-testN hml   39.682 18452 5.91 3.92 0 22463
+      
+cache-scratch1 hml   01.69 3908 1.68 0.00 0 269
+      
+glibc-simple hml   05.09 3724 5.08 0.00 0 391
+      
+larsonN     hml   107.826 12408 4.85 0.14 0 50389
+      
+malloc-large hml   11.46 410576 1.22 10.23 0 7745780
+      
+mleak10     hml   00.08 3664 0.00 0.11 0 6317
+      
+mleak100    hml   00.77 3684 0.10 1.02 0 60319
+      
+rbstress1   hml   04.20 140024 4.00 0.19 0 126451
+      
+cache-thrash1 hml   01.77 3888 1.77 0.00 0 268
+
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  iso
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       iso   0:09.81 13048 9.58 0.26 2 3146
+
+---- 1: espresso
+
+run 1: espresso iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./espresso ../../bench/espresso/largest.espresso
+espresso    iso   0:07.57 51624 7.42 0.15 0 23431
+
+---- 1: barnes
+
+run 1: barnes iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./barnes
+barnes      iso   0:02.72 65988 2.70 0.01 0 17547
+
+---- 1: redis
+
+run 1: redis iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis iso: ops/sec: 155593.59, relative time: 12.853s
+redis       iso   0:12.853 69248 5.85 0.58 0 16728
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       iso   4:23.65 849752 256.30 7.33 0 280363
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,iso, relative time: 161.138s
+larsonN-sized iso   0:161.138 36808 4.41 0.60 0 8594
+
+---- 1: mstressN
+
+run 1: mstressN iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./mstress 1 50 25
+mstressN    iso   0:00.10 38104 0.07 0.03 0 15621
+
+---- 1: rptestN
+
+run 1: rptestN iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,iso: ops/sec: 3519235, relative time: .568s
+rptestN     iso   0:.568 31096 0.16 0.19 0 7368
+
+---- 1: gs
+
+run 1: gs iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          iso   0:01.32 77820 1.17 0.14 0 86692
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./alloc-test 1
+threads: 1
+alloc-test1 iso   0:09.68 36112 9.48 0.19 0 8664
+
+---- 1: sh6benchN
+
+run 1: sh6benchN iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./sh6bench 2
+sh6benchN   iso   1:10.10 1333252 80.26 49.63 0 360244
+
+---- 1: sh8benchN
+
+run 1: sh8benchN iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./sh8bench 2
+sh8benchN   iso   3:18.06 241032 227.82 104.95 0 288566
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,iso, relative time: 45.453s
+xmalloc-testN iso   0:45.453 39020 5.95 3.50 0 10820
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 iso   0:01.76 11200 1.74 0.00 0 2154
+
+---- 1: glibc-simple
+
+run 1: glibc-simple iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./glibc-simple
+glibc-simple iso   0:07.44 15304 7.27 0.16 0 3629
+
+---- 1: larsonN
+
+run 1: larsonN iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,iso, relative time: 159.020s
+larsonN     iso   0:159.020 36864 4.53 0.48 0 8609
+
+---- 1: malloc-large
+
+run 1: malloc-large iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./malloc-large
+malloc-large iso   0:11.28 1418580 1.36 9.92 0 7747780
+
+---- 1: mleak10
+
+run 1: mleak10 iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./mleak 5
+mleak10     iso   0:00.08 11356 0.02 0.09 0 8554
+
+---- 1: mleak100
+
+run 1: mleak100 iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./mleak 50
+mleak100    iso   0:00.78 21048 0.11 1.03 0 65015
+
+---- 1: rbstress1
+
+run 1: rbstress1 iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 iso: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/iso/build/libisoalloc.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 iso   0:01.50 11472 1.48 0.01 0 2170
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cache-thrash1 iso   01.50 11472 1.48 0.01 0 2170
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+mi-sec
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  mi-sec
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       mi-sec 0:05.69 3536 5.68 0.00 4 413
+
+---- 1: espresso
+
+run 1: espresso mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./espresso ../../bench/espresso/largest.espresso
+espresso    mi-sec 0:05.61 6084 5.59 0.01 0 1174
+
+---- 1: barnes
+
+run 1: barnes mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./barnes
+barnes      mi-sec 0:02.77 58604 2.75 0.01 0 15629
+
+---- 1: redis
+
+run 1: redis mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis mi-sec: ops/sec: 421762.97, relative time: 4.741s
+redis       mi-sec 0:4.741 31880 2.12 0.26 0 7145
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       mi-sec 1:09.24 363600 69.01 0.26 0 87808
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,mi-sec, relative time: 41.560s
+larsonN-sized mi-sec 0:41.560 20592 5.01 0.01 0 4472
+
+---- 1: mstressN
+
+run 1: mstressN mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./mstress 1 50 25
+mstressN    mi-sec 0:00.06 12400 0.05 0.01 0 2773
+
+---- 1: rptestN
+
+run 1: rptestN mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,mi-sec: ops/sec: 5505864, relative time: .363s
+rptestN     mi-sec 0:.363 10288 0.13 0.18 0 2098
+
+---- 1: gs
+
+run 1: gs mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          mi-sec 0:01.14 43296 1.12 0.01 0 7897
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./alloc-test 1
+threads: 1
+alloc-test1 mi-sec 0:04.64 12776 4.64 0.00 0 2574
+
+---- 1: sh6benchN
+
+run 1: sh6benchN mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./sh6bench 2
+sh6benchN   mi-sec 0:01.47 264608 2.78 0.13 0 65815
+
+---- 1: sh8benchN
+
+run 1: sh8benchN mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./sh8bench 2
+sh8benchN   mi-sec 0:06.82 150368 13.54 0.46 0 38826
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,mi-sec, relative time: 5.802s
+xmalloc-testN mi-sec 0:5.802 3392 6.89 0.10 0 499
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 mi-sec 0:01.78 3936 1.78 0.00 0 238
+
+---- 1: glibc-simple
+
+run 1: glibc-simple mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./glibc-simple
+glibc-simple mi-sec 0:02.62 2272 2.61 0.00 0 252
+
+---- 1: larsonN
+
+run 1: larsonN mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,mi-sec, relative time: 41.093s
+larsonN     mi-sec 0:41.093 20612 5.00 0.01 0 4476
+
+---- 1: malloc-large
+
+run 1: malloc-large mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./malloc-large
+malloc-large mi-sec 0:01.56 782360 1.30 0.25 0 197561
+
+---- 1: mleak10
+
+run 1: mleak10 mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./mleak 5
+mleak10     mi-sec 0:00.08 2380 0.04 0.09 0 6275
+
+---- 1: mleak100
+
+run 1: mleak100 mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./mleak 50
+mleak100    mi-sec 0:00.76 2700 0.26 1.01 0 60342
+
+---- 1: rbstress1
+
+run 1: rbstress1 mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+rbstress1   mi-sec 0:03.64 161348 3.57 0.06 0 39758
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 mi-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mimalloc/out/secure/libmimalloc-secure.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 mi-sec 0:01.76 4032 1.75 0.00 0 245
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       mi-sec 05.69 3536 5.68 0.00 4 413
+      
+espresso    mi-sec 05.61 6084 5.59 0.01 0 1174
+      
+barnes      mi-sec 02.77 58604 2.75 0.01 0 15629
+      
+redis       mi-sec 4.741 31880 2.12 0.26 0 7145
+      
+leanN       mi-sec 1:09.24 363600 69.01 0.26 0 87808
+      
+larsonN-sized mi-sec 41.560 20592 5.01 0.01 0 4472
+      
+mstressN    mi-sec 00.06 12400 0.05 0.01 0 2773
+      
+rptestN     mi-sec .363 10288 0.13 0.18 0 2098
+      
+gs          mi-sec 01.14 43296 1.12 0.01 0 7897
+      
+alloc-test1 mi-sec 04.64 12776 4.64 0.00 0 2574
+      
+sh6benchN   mi-sec 01.47 264608 2.78 0.13 0 65815
+      
+sh8benchN   mi-sec 06.82 150368 13.54 0.46 0 38826
+      
+xmalloc-testN mi-sec 5.802 3392 6.89 0.10 0 499
+      
+cache-scratch1 mi-sec 01.78 3936 1.78 0.00 0 238
+      
+glibc-simple mi-sec 02.62 2272 2.61 0.00 0 252
+      
+larsonN     mi-sec 41.093 20612 5.00 0.01 0 4476
+      
+malloc-large mi-sec 01.56 782360 1.30 0.25 0 197561
+      
+mleak10     mi-sec 00.08 2380 0.04 0.09 0 6275
+      
+mleak100    mi-sec 00.76 2700 0.26 1.01 0 60342
+      
+rbstress1   mi-sec 03.64 161348 3.57 0.06 0 39758
+      
+cache-thrash1 mi-sec 01.76 4032 1.75 0.00 0 245
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+mng
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  mng
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       mng   0:07.40 2736 7.38 0.01 1 7285
+
+---- 1: espresso
+
+run 1: espresso mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./espresso ../../bench/espresso/largest.espresso
+espresso    mng   0:06.67 2432 5.79 0.87 0 749774
+
+---- 1: barnes
+
+run 1: barnes mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./barnes
+barnes      mng   0:02.31 58436 2.29 0.01 0 15607
+
+---- 1: redis
+
+run 1: redis mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis mng: ops/sec: 373971.56, relative time: 5.348s
+redis       mng   0:5.348 33968 2.28 0.41 0 46841
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       mng   1:30.93 423416 89.13 1.83 0 1090895
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,mng, relative time: 135.949s
+larsonN-sized mng   0:135.949 7424 5.00 0.00 0 1588
+
+---- 1: mstressN
+
+run 1: mstressN mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./mstress 1 50 25
+mstressN    mng   0:00.10 4880 0.06 0.03 0 21816
+
+---- 1: rptestN
+
+run 1: rptestN mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,mng: ops/sec: 2496295, relative time: .801s
+rptestN     mng   0:.801 5168 0.10 0.26 0 16038
+
+---- 1: gs
+
+run 1: gs mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          mng   0:01.33 38224 1.16 0.16 0 75658
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./alloc-test 1
+threads: 1
+alloc-test1 mng   0:08.53 12620 8.53 0.00 0 3362
+
+---- 1: sh6benchN
+
+run 1: sh6benchN mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./sh6bench 2
+sh6benchN   mng   0:22.64 349328 30.02 13.86 0 642469
+
+---- 1: sh8benchN
+
+run 1: sh8benchN mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./sh8bench 2
+sh8benchN   mng   0:44.45 134328 62.26 26.00 0 899994
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,mng, relative time: 8.942s
+xmalloc-testN mng   0:8.942 2032 6.64 2.04 0 139383
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 mng   0:01.69 3720 1.69 0.00 0 219
+
+---- 1: glibc-simple
+
+run 1: glibc-simple mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./glibc-simple
+glibc-simple mng   0:07.86 2072 5.70 1.54 0 1196768
+
+---- 1: larsonN
+
+run 1: larsonN mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,mng, relative time: 127.381s
+larsonN     mng   0:127.381 7624 4.99 0.00 0 1608
+
+---- 1: malloc-large
+
+run 1: malloc-large mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./malloc-large
+malloc-large mng   0:11.84 410376 1.36 10.47 0 7745735
+
+---- 1: mleak10
+
+run 1: mleak10 mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./mleak 5
+mleak10     mng   0:00.07 1972 0.02 0.08 0 6276
+
+---- 1: mleak100
+
+run 1: mleak100 mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./mleak 50
+mleak100    mng   0:00.81 2088 0.13 1.01 0 60280
+
+---- 1: rbstress1
+
+run 1: rbstress1 mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+rbstress1   mng   0:03.91 162792 3.80 0.11 0 69060
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 mng: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/mng/libmallocng.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 mng   0:01.81 3536 1.80 0.00 0 220
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       mng   07.40 2736 7.38 0.01 1 7285
+      
+espresso    mng   06.67 2432 5.79 0.87 0 749774
+      
+barnes      mng   02.31 58436 2.29 0.01 0 15607
+      
+redis       mng   5.348 33968 2.28 0.41 0 46841
+      
+leanN       mng   1:30.93 423416 89.13 1.83 0 1090895
+      
+larsonN-sized mng   135.949 7424 5.00 0.00 0 1588
+      
+mstressN    mng   00.10 4880 0.06 0.03 0 21816
+      
+rptestN     mng   .801 5168 0.10 0.26 0 16038
+      
+gs          mng   01.33 38224 1.16 0.16 0 75658
+      
+alloc-test1 mng   08.53 12620 8.53 0.00 0 3362
+      
+sh6benchN   mng   22.64 349328 30.02 13.86 0 642469
+      
+sh8benchN   mng   44.45 134328 62.26 26.00 0 899994
+      
+xmalloc-testN mng   8.942 2032 6.64 2.04 0 139383
+      
+cache-scratch1 mng   01.69 3720 1.69 0.00 0 219
+      
+glibc-simple mng   07.86 2072 5.70 1.54 0 1196768
+      
+larsonN     mng   127.381 7624 4.99 0.00 0 1608
+      
+malloc-large mng   11.84 410376 1.36 10.47 0 7745735
+      
+mleak10     mng   00.07 1972 0.02 0.08 0 6276
+      
+mleak100    mng   00.81 2088 0.13 1.01 0 60280
+      
+rbstress1   mng   03.91 162792 3.80 0.11 0 69060
+      
+cache-thrash1 mng   01.81 3536 1.80 0.00 0 220
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+scudo
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  scudo
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       scudo 0:06.83 4564 6.82 0.00 2 593
+
+---- 1: espresso
+
+run 1: espresso scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./espresso ../../bench/espresso/largest.espresso
+espresso    scudo 0:06.05 4920 6.04 0.00 0 632
+
+---- 1: barnes
+
+run 1: barnes scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./barnes
+barnes      scudo 0:02.73 59740 2.71 0.02 0 15670
+
+---- 1: redis
+
+run 1: redis scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis scudo: ops/sec: 373552.47, relative time: 5.354s
+redis       scudo 0:5.354 38044 2.32 0.36 0 8474
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       scudo 1:22.05 534980 81.75 0.27 0 147996
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,scudo, relative time: 70.263s
+larsonN-sized scudo 0:70.263 10084 4.98 0.01 0 1863
+
+---- 1: mstressN
+
+run 1: mstressN scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./mstress 1 50 25
+mstressN    scudo 0:00.07 6260 0.07 0.00 0 5141
+
+---- 1: rptestN
+
+run 1: rptestN scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,scudo: ops/sec: 4621446, relative time: .432s
+rptestN     scudo 0:.432 6588 0.17 0.15 0 1251
+
+---- 1: gs
+
+run 1: gs scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          scudo 0:01.13 39528 1.05 0.07 0 17160
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./alloc-test 1
+threads: 1
+alloc-test1 scudo 0:05.44 15644 5.45 0.00 0 3502
+
+---- 1: sh6benchN
+
+run 1: sh6benchN scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./sh6bench 2
+sh6benchN   scudo 0:05.16 478040 10.00 0.21 0 141948
+
+---- 1: sh8benchN
+
+run 1: sh8benchN scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./sh8bench 2
+sh8benchN   scudo 0:23.91 178728 47.55 0.57 0 103912
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,scudo, relative time: 6.497s
+xmalloc-testN scudo 0:6.497 51044 8.34 0.11 0 12269
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 scudo 0:01.82 3836 1.82 0.00 0 236
+
+---- 1: glibc-simple
+
+run 1: glibc-simple scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./glibc-simple
+glibc-simple scudo 0:04.38 3580 4.38 0.00 0 320
+
+---- 1: larsonN
+
+run 1: larsonN scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,scudo, relative time: 69.497s
+larsonN     scudo 0:69.497 10288 4.99 0.01 0 1872
+
+---- 1: malloc-large
+
+run 1: malloc-large scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./malloc-large
+malloc-large scudo 0:11.52 410516 1.34 10.19 0 7745777
+
+---- 1: mleak10
+
+run 1: mleak10 scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./mleak 5
+mleak10     scudo 0:00.08 3680 0.01 0.11 0 12314
+
+---- 1: mleak100
+
+run 1: mleak100 scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./mleak 50
+mleak100    scudo 0:00.86 3728 0.23 1.03 0 120313
+
+---- 1: rbstress1
+
+run 1: rbstress1 scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+rbstress1   scudo 0:03.92 178328 3.77 0.16 0 114757
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 scudo: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/scudo/compiler-rt/lib/scudo/standalone/libscudo.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 scudo 0:01.72 3860 1.72 0.00 0 234
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       scudo 06.83 4564 6.82 0.00 2 593
+      
+espresso    scudo 06.05 4920 6.04 0.00 0 632
+      
+barnes      scudo 02.73 59740 2.71 0.02 0 15670
+      
+redis       scudo 5.354 38044 2.32 0.36 0 8474
+      
+leanN       scudo 1:22.05 534980 81.75 0.27 0 147996
+      
+larsonN-sized scudo 70.263 10084 4.98 0.01 0 1863
+      
+mstressN    scudo 00.07 6260 0.07 0.00 0 5141
+      
+rptestN     scudo .432 6588 0.17 0.15 0 1251
+      
+gs          scudo 01.13 39528 1.05 0.07 0 17160
+      
+alloc-test1 scudo 05.44 15644 5.45 0.00 0 3502
+      
+sh6benchN   scudo 05.16 478040 10.00 0.21 0 141948
+      
+sh8benchN   scudo 23.91 178728 47.55 0.57 0 103912
+      
+xmalloc-testN scudo 6.497 51044 8.34 0.11 0 12269
+      
+cache-scratch1 scudo 01.82 3836 1.82 0.00 0 236
+      
+glibc-simple scudo 04.38 3580 4.38 0.00 0 320
+      
+larsonN     scudo 69.497 10288 4.99 0.01 0 1872
+      
+malloc-large scudo 11.52 410516 1.34 10.19 0 7745777
+      
+mleak10     scudo 00.08 3680 0.01 0.11 0 12314
+      
+mleak100    scudo 00.86 3728 0.23 1.03 0 120313
+      
+rbstress1   scudo 03.92 178328 3.77 0.16 0 114757
+      
+cache-thrash1 scudo 01.72 3860 1.72 0.00 0 234
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+sn-sec
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  sn-sec
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       sn-sec 0:05.21 3620 5.20 0.00 2 493
+
+---- 1: espresso
+
+run 1: espresso sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./espresso ../../bench/espresso/largest.espresso
+espresso    sn-sec 0:05.32 9932 5.30 0.02 1 2187
+
+---- 1: barnes
+
+run 1: barnes sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./barnes
+barnes      sn-sec 0:02.80 59308 2.79 0.01 0 16001
+
+---- 1: redis
+
+run 1: redis sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis sn-sec: ops/sec: 434404.84, relative time: 4.604s
+redis       sn-sec 0:4.604 32128 2.01 0.30 0 7220
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       sn-sec 1:07.97 445208 67.80 0.24 0 120425
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,sn-sec, relative time: 34.479s
+larsonN-sized sn-sec 0:34.479 21448 5.01 0.02 0 4727
+
+---- 1: mstressN
+
+run 1: mstressN sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./mstress 1 50 25
+mstressN    sn-sec 0:00.06 8528 0.06 0.00 0 1834
+
+---- 1: rptestN
+
+run 1: rptestN sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,sn-sec: ops/sec: 5961944, relative time: .335s
+rptestN     sn-sec 0:.335 8312 0.11 0.20 0 1947
+
+---- 1: gs
+
+run 1: gs sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          sn-sec 0:01.16 46536 1.14 0.01 0 10503
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./alloc-test 1
+threads: 1
+alloc-test1 sn-sec 0:04.55 14016 4.55 0.00 0 2904
+
+---- 1: sh6benchN
+
+run 1: sh6benchN sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./sh6bench 2
+sh6benchN   sn-sec 0:01.36 360840 2.57 0.12 0 90089
+
+---- 1: sh8benchN
+
+run 1: sh8benchN sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./sh8bench 2
+sh8benchN   sn-sec 0:05.52 176740 10.46 0.73 0 865162
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,sn-sec, relative time: 4.005s
+xmalloc-testN sn-sec 0:4.005 6152 6.00 0.13 0 1191
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 sn-sec 0:01.76 3856 1.76 0.00 0 254
+
+---- 1: glibc-simple
+
+run 1: glibc-simple sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./glibc-simple
+glibc-simple sn-sec 0:02.66 2160 2.66 0.00 0 282
+
+---- 1: larsonN
+
+run 1: larsonN sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,sn-sec, relative time: 35.808s
+larsonN     sn-sec 0:35.808 21480 4.98 0.03 0 4737
+
+---- 1: malloc-large
+
+run 1: malloc-large sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./malloc-large
+malloc-large sn-sec 0:09.04 650260 1.48 7.55 0 7746238
+
+---- 1: mleak10
+
+run 1: mleak10 sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./mleak 5
+mleak10     sn-sec 0:00.08 2804 0.05 0.09 0 9416
+
+---- 1: mleak100
+
+run 1: mleak100 sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./mleak 50
+mleak100    sn-sec 0:00.84 2860 0.51 1.05 0 90480
+
+---- 1: rbstress1
+
+run 1: rbstress1 sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+rbstress1   sn-sec 0:03.62 141888 3.50 0.12 0 98148
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 sn-sec: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/snmalloc/release/libsnmallocshim-checks.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 sn-sec 0:01.66 3836 1.66 0.00 0 255
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       sn-sec 05.21 3620 5.20 0.00 2 493
+      
+espresso    sn-sec 05.32 9932 5.30 0.02 1 2187
+      
+barnes      sn-sec 02.80 59308 2.79 0.01 0 16001
+      
+redis       sn-sec 4.604 32128 2.01 0.30 0 7220
+      
+leanN       sn-sec 1:07.97 445208 67.80 0.24 0 120425
+      
+larsonN-sized sn-sec 34.479 21448 5.01 0.02 0 4727
+      
+mstressN    sn-sec 00.06 8528 0.06 0.00 0 1834
+      
+rptestN     sn-sec .335 8312 0.11 0.20 0 1947
+      
+gs          sn-sec 01.16 46536 1.14 0.01 0 10503
+      
+alloc-test1 sn-sec 04.55 14016 4.55 0.00 0 2904
+      
+sh6benchN   sn-sec 01.36 360840 2.57 0.12 0 90089
+      
+sh8benchN   sn-sec 05.52 176740 10.46 0.73 0 865162
+      
+xmalloc-testN sn-sec 4.005 6152 6.00 0.13 0 1191
+      
+cache-scratch1 sn-sec 01.76 3856 1.76 0.00 0 254
+      
+glibc-simple sn-sec 02.66 2160 2.66 0.00 0 282
+      
+larsonN     sn-sec 35.808 21480 4.98 0.03 0 4737
+      
+malloc-large sn-sec 09.04 650260 1.48 7.55 0 7746238
+      
+mleak10     sn-sec 00.08 2804 0.05 0.09 0 9416
+      
+mleak100    sn-sec 00.84 2860 0.51 1.05 0 90480
+      
+rbstress1   sn-sec 03.62 141888 3.50 0.12 0 98148
+      
+cache-thrash1 sn-sec 01.66 3836 1.66 0.00 0 255
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+sg
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  sg
+tests     :  cfrac espresso barnes larson-sized mstress rptest gs alloc-test xmalloc-test cscratch larson malloc-large mleak cthrash
+
+---- 1: cfrac
+
+run 1: cfrac sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       sg    0:12.60 4024 11.75 0.85 0 745489
+
+---- 1: espresso
+
+run 1: espresso sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./espresso ../../bench/espresso/largest.espresso
+espresso    sg    0:18.83 866224 9.37 9.44 0 8278166
+
+---- 1: barnes
+
+run 1: barnes sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./barnes
+barnes      sg    0:02.25 59304 2.22 0.02 0 15806
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,sg, relative time: 842.013s
+larsonN-sized sg    0:842.013 227136 1.79 3.22 0 2322030
+
+---- 1: mstressN
+
+run 1: mstressN sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./mstress 1 50 25
+mstressN    sg    0:00.15 18820 0.08 0.06 0 29909
+
+---- 1: rptestN
+
+run 1: rptestN sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,sg: ops/sec: 613106, relative time: 3.262s
+rptestN     sg    0:3.262 20200 0.18 0.48 0 179398
+
+---- 1: gs
+
+run 1: gs sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          sg    0:01.87 119476 1.29 0.57 0 304455
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./alloc-test 1
+threads: 1
+alloc-test1 sg    0:11.96 19924 11.40 0.55 0 297419
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,sg, relative time: 44.919s
+xmalloc-testN sg    0:44.919 43392 6.25 3.67 0 49158
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 sg    0:01.63 4412 1.62 0.01 0 1430
+
+---- 1: larsonN
+
+run 1: larsonN sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,sg, relative time: 923.083s
+larsonN     sg    0:923.083 207672 1.82 3.21 0 2122436
+
+---- 1: malloc-large
+
+run 1: malloc-large sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./malloc-large
+malloc-large sg    0:09.92 415988 1.13 8.78 0 7747918
+
+---- 1: mleak10
+
+run 1: mleak10 sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./mleak 5
+mleak10     sg    0:00.07 2932 0.00 0.10 0 10207
+
+---- 1: mleak100
+
+run 1: mleak100 sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./mleak 50
+mleak100    sg    0:00.75 2876 0.12 0.95 0 98003
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 sg: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/sg/libSlimGuard.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 sg    0:01.50 4540 1.49 0.00 0 1425
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       sg    12.60 4024 11.75 0.85 0 745489
+      
+espresso    sg    18.83 866224 9.37 9.44 0 8278166
+      
+barnes      sg    02.25 59304 2.22 0.02 0 15806
+      
+larsonN-sized sg    842.013 227136 1.79 3.22 0 2322030
+      
+mstressN    sg    00.15 18820 0.08 0.06 0 29909
+      
+rptestN     sg    3.262 20200 0.18 0.48 0 179398
+      
+gs          sg    01.87 119476 1.29 0.57 0 304455
+      
+alloc-test1 sg    11.96 19924 11.40 0.55 0 297419
+      
+xmalloc-testN sg    44.919 43392 6.25 3.67 0 49158
+      
+cache-scratch1 sg    01.63 4412 1.62 0.01 0 1430
+      
+larsonN     sg    923.083 207672 1.82 3.21 0 2122436
+      
+malloc-large sg    09.92 415988 1.13 8.78 0 7747918
+      
+mleak10     sg    00.07 2932 0.00 0.10 0 10207
+      
+mleak100    sg    00.75 2876 0.12 0.95 0 98003
+      
+cache-thrash1 sg    01.50 4540 1.49 0.00 0 1425
+
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  ota
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./cfrac 17545186520507317056371138836327483792789528
+cfrac       ota   0:10.70 792924 9.92 0.78 0 654442
+
+---- 1: espresso
+
+run 1: espresso ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./espresso ../../bench/espresso/largest.espresso
+espresso    ota   0:07.73 10788 6.84 0.88 0 788517
+
+---- 1: barnes
+
+run 1: barnes ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./barnes
+barnes      ota   0:02.72 58896 2.71 0.00 0 15740
+
+---- 1: redis
+
+run 1: redis ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis ota: ops/sec: 57710.07, relative time: 34.655s
+redis       ota   0:34.655 739476 7.44 9.95 0 9264623
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       ota   2:00.64 5589432 114.63 6.04 0 4063899
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,ota, relative time: 244.344s
+larsonN-sized ota   0:244.344 63844 2.04 2.96 0 2564200
+
+---- 1: mstressN
+
+run 1: mstressN ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./mstress 1 50 25
+mstressN    ota   0:00.11 7888 0.07 0.03 0 21615
+
+---- 1: rptestN
+
+run 1: rptestN ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,ota: ops/sec: 1828668, relative time: 1.093s
+rptestN     ota   0:1.093 96752 0.12 0.29 0 78533
+
+---- 1: gs
+
+run 1: gs ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          ota   0:01.52 83884 1.18 0.34 0 206076
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./alloc-test 1
+threads: 1
+alloc-test1 ota   0:09.05 1204144 8.32 0.72 0 433162
+
+---- 1: sh6benchN
+
+run 1: sh6benchN ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./sh6bench 2
+sh6benchN   ota   0:27.59 3697304 51.29 2.50 0 1773918
+
+---- 1: sh8benchN
+
+run 1: sh8benchN ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./sh8bench 2
+sh8benchN   ota   0:56.22 237000 108.45 6.20 0 3309045
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,ota, relative time: 18.192s
+xmalloc-testN ota   0:18.192 4940 8.02 0.94 0 486221
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 ota   0:01.70 4992 1.70 0.00 0 486
+
+---- 1: glibc-simple
+
+run 1: glibc-simple ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./glibc-simple
+glibc-simple ota   0:07.26 3688 6.42 0.83 0 875546
+
+---- 1: larsonN
+
+run 1: larsonN ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./larson 5 8 1000 5000 100 4141 1
+larsonN,ota, relative time: 243.308s
+larsonN     ota   0:243.308 64432 1.98 3.02 0 2575318
+
+---- 1: malloc-large
+
+run 1: malloc-large ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./malloc-large
+malloc-large ota   0:11.45 411700 1.25 10.19 0 7744955
+
+---- 1: mleak10
+
+run 1: mleak10 ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./mleak 5
+mleak10     ota   0:00.07 7688 0.01 0.10 0 7814
+
+---- 1: mleak100
+
+run 1: mleak100 ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./mleak 50
+mleak100    ota   0:00.75 8016 0.18 0.94 0 64102
+
+---- 1: rbstress1
+
+run 1: rbstress1 ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+rbstress1   ota   0:05.02 192184 4.75 0.26 0 183355
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 ota: LD_PRELOAD=/home/dan/workspace/licenta/mimalloc-bench/extern/ota/libota_allocator.so ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 ota   0:01.72 4880 1.72 0.00 0 488
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       ota   10.70 792924 9.92 0.78 0 654442
+      
+espresso    ota   07.73 10788 6.84 0.88 0 788517
+      
+barnes      ota   02.72 58896 2.71 0.00 0 15740
+      
+redis       ota   34.655 739476 7.44 9.95 0 9264623
+      
+leanN       ota   2:00.64 5589432 114.63 6.04 0 4063899
+      
+larsonN-sized ota   244.344 63844 2.04 2.96 0 2564200
+      
+mstressN    ota   00.11 7888 0.07 0.03 0 21615
+      
+rptestN     ota   1.093 96752 0.12 0.29 0 78533
+      
+gs          ota   01.52 83884 1.18 0.34 0 206076
+      
+alloc-test1 ota   09.05 1204144 8.32 0.72 0 433162
+      
+sh6benchN   ota   27.59 3697304 51.29 2.50 0 1773918
+      
+sh8benchN   ota   56.22 237000 108.45 6.20 0 3309045
+      
+xmalloc-testN ota   18.192 4940 8.02 0.94 0 486221
+      
+cache-scratch1 ota   01.70 4992 1.70 0.00 0 486
+      
+glibc-simple ota   07.26 3688 6.42 0.83 0 875546
+      
+larsonN     ota   243.308 64432 1.98 3.02 0 2575318
+      
+malloc-large ota   11.45 411700 1.25 10.19 0 7744955
+      
+mleak10     ota   00.07 7688 0.01 0.10 0 7814
+      
+mleak100    ota   00.75 8016 0.18 0.94 0 64102
+      
+rbstress1   ota   05.02 192184 4.75 0.26 0 183355
+      
+cache-thrash1 ota   01.72 4880 1.72 0.00 0 488
+
+
+==================================================================================================
+==================================================================================================
+================================================================================================
+==================================================================================================
+==================================================================================================
+sys
+
+Running on Debian or Ubuntu: errors are considered fatal
+benchmarking on 1 cores.
+use '-h' or '--help' for help on configuration options.
+
+allocators:  sys
+tests     :  cfrac espresso barnes redis lean larson-sized mstress rptest gs alloc-test sh6bench sh8bench xmalloc-test cscratch glibc-simple larson malloc-large mleak rbstress cthrash
+
+---- 1: cfrac
+
+run 1: cfrac sys: SYSMALLOC=1 ./cfrac 17545186520507317056371138836327483792789528
+cfrac       sys   0:05.19 3152 5.19 0.00 0 422
+
+---- 1: espresso
+
+run 1: espresso sys: SYSMALLOC=1 ./espresso ../../bench/espresso/largest.espresso
+espresso    sys   0:05.82 2348 5.80 0.01 0 450
+
+---- 1: barnes
+
+run 1: barnes sys: SYSMALLOC=1 ./barnes
+barnes      sys   0:02.73 58264 2.71 0.01 0 15598
+
+---- 1: redis
+
+run 1: redis sys: SYSMALLOC=1 /home/dan/workspace/licenta/mimalloc-bench/extern/redis-6.2.6/src/redis-benchmark -r 1000000 -n 1000000 -q -P 16 lpush a 1 2 3 4 5 lrange a 1 5
+start server
+OK
+OK
+redis sys: ops/sec: 382701.88, relative time: 5.225s
+redis       sys   0:5.225 30448 2.32 0.30 0 6802
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: leanN
+
+run 1: leanN sys: SYSMALLOC=1 ../bin/lean --make -j 1
+preprocess...
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/out/release /home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+Built target clean-leanpkg
+Built target clean-std-lib
+Built target clean-olean
+/home/dan/workspace/licenta/mimalloc-bench/extern/lean/library /home/dan/workspace/licenta/mimalloc-bench/out/bench
+leanN       sys   1:23.73 408100 83.56 0.19 0 100105
+/home/dan/workspace/licenta/mimalloc-bench/out/bench
+
+---- 1: larsonN-sized
+
+run 1: larsonN-sized sys: SYSMALLOC=1 ./larson-sized 5 8 1000 5000 100 4141 1
+larsonN-sized,sys, relative time: 44.226s
+larsonN-sized sys   0:44.226 14160 4.98 0.02 0 2861
+
+---- 1: mstressN
+
+run 1: mstressN sys: SYSMALLOC=1 ./mstress 1 50 25
+mstressN    sys   0:00.06 5064 0.06 0.00 0 1236
+
+---- 1: rptestN
+
+run 1: rptestN sys: SYSMALLOC=1 ./rptest 1 0 1 2 500 1000 100 8 16000
+rptestN,sys: ops/sec: 4436819, relative time: .450s
+rptestN     sys   0:.450 4236 0.19 0.13 0 1097
+
+---- 1: gs
+
+run 1: gs sys: SYSMALLOC=1 gs -dBATCH -dNODISPLAY /home/dan/workspace/licenta/mimalloc-bench/extern/large.pdf
+gs          sys   0:01.11 38164 1.10 0.01 0 7278
+
+---- 1: alloc-test1
+
+run 1: alloc-test1 sys: SYSMALLOC=1 ./alloc-test 1
+threads: 1
+alloc-test1 sys   0:05.25 13288 5.24 0.00 0 2926
+
+---- 1: sh6benchN
+
+run 1: sh6benchN sys: SYSMALLOC=1 ./sh6bench 2
+sh6benchN   sys   0:03.70 420788 7.19 0.18 0 104862
+
+---- 1: sh8benchN
+
+run 1: sh8benchN sys: SYSMALLOC=1 ./sh8bench 2
+sh8benchN   sys   0:09.96 167648 20.88 0.08 0 61892
+
+---- 1: xmalloc-testN
+
+run 1: xmalloc-testN sys: SYSMALLOC=1 ./xmalloc-test -w 1 -t 5 -s 64
+xmalloc-testN,sys, relative time: 12.043s
+xmalloc-testN sys   0:12.043 3064 9.14 0.06 0 462
+
+---- 1: cache-scratch1
+
+run 1: cache-scratch1 sys: SYSMALLOC=1 ./cache-scratch 1 1000 1 2000000 1
+cache-scratch1 sys   0:01.69 3700 1.69 0.00 0 212
+
+---- 1: glibc-simple
+
+run 1: glibc-simple sys: SYSMALLOC=1 ./glibc-simple
+glibc-simple sys   0:03.86 2088 3.85 0.00 0 207
+
+---- 1: larsonN
+
+run 1: larsonN sys: SYSMALLOC=1 ./larson 5 8 1000 5000 100 4141 1
+larsonN,sys, relative time: 43.916s
+larsonN     sys   0:43.916 13896 4.97 0.03 0 2857
+
+---- 1: malloc-large
+
+run 1: malloc-large sys: SYSMALLOC=1 ./malloc-large
+malloc-large sys   0:01.81 486144 1.17 0.63 0 523785
+
+---- 1: mleak10
+
+run 1: mleak10 sys: SYSMALLOC=1 ./mleak 5
+mleak10     sys   0:00.06 2116 0.02 0.08 0 6229
+
+---- 1: mleak100
+
+run 1: mleak100 sys: SYSMALLOC=1 ./mleak 50
+mleak100    sys   0:00.69 2544 0.12 0.91 0 60337
+
+---- 1: rbstress1
+
+run 1: rbstress1 sys: SYSMALLOC=1 ruby /home/dan/workspace/licenta/mimalloc-bench/bench/rbstress/stress_mem.rb 1
+rbstress1   sys   0:03.26 134824 3.21 0.03 0 33074
+
+---- 1: cache-thrash1
+
+run 1: cache-thrash1 sys: SYSMALLOC=1 ./cache-thrash 1 1000 1 2000000 1
+cache-thrash1 sys   0:01.48 3684 1.48 0.00 0 213
+
+results written to: /home/dan/workspace/licenta/mimalloc-bench/out/bench/benchres.csv
+
+#------------------------------------------------------------------
+# test    alloc   time  rss    user  sys  page-faults page-reclaims
+      
+cfrac       sys   05.19 3152 5.19 0.00 0 422
+      
+espresso    sys   05.82 2348 5.80 0.01 0 450
+      
+barnes      sys   02.73 58264 2.71 0.01 0 15598
+      
+redis       sys   5.225 30448 2.32 0.30 0 6802
+      
+leanN       sys   1:23.73 408100 83.56 0.19 0 100105
+      
+larsonN-sized sys   44.226 14160 4.98 0.02 0 2861
+      
+mstressN    sys   00.06 5064 0.06 0.00 0 1236
+      
+rptestN     sys   .450 4236 0.19 0.13 0 1097
+      
+gs          sys   01.11 38164 1.10 0.01 0 7278
+      
+alloc-test1 sys   05.25 13288 5.24 0.00 0 2926
+      
+sh6benchN   sys   03.70 420788 7.19 0.18 0 104862
+      
+sh8benchN   sys   09.96 167648 20.88 0.08 0 61892
+      
+xmalloc-testN sys   12.043 3064 9.14 0.06 0 462
+      
+cache-scratch1 sys   01.69 3700 1.69 0.00 0 212
+      
+glibc-simple sys   03.86 2088 3.85 0.00 0 207
+      
+larsonN     sys   43.916 13896 4.97 0.03 0 2857
+      
+malloc-large sys   01.81 486144 1.17 0.63 0 523785
+      
+mleak10     sys   00.06 2116 0.02 0.08 0 6229
+      
+mleak100    sys   00.69 2544 0.12 0.91 0 60337
+      
+rbstress1   sys   03.26 134824 3.21 0.03 0 33074
+      
+cache-thrash1 sys   01.48 3684 1.48 0.00 0 213
+
+
+

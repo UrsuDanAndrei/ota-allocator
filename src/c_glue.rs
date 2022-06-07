@@ -59,9 +59,9 @@ pub static mut ALLOCATOR: OtaAllocator<'static, MetaAlloc> = OtaAllocator::new_i
 // =================================================================================================
 // =================================================================================================
 //
-// use hoard_sys::Jemalloc;
-// type MetaAlloc = Jemalloc;
-// pub static mut ALLOCATOR: OtaAllocator<'static, MetaAlloc> = OtaAllocator::new_in(Jemalloc);
+// use libc_alloc::LibcAlloc;
+// type MetaAlloc = LibcAlloc;
+// pub static mut ALLOCATOR: OtaAllocator<'static, MetaAlloc> = OtaAllocator::new_in(LibcAlloc);
 
 pub static IS_INIT: AtomicBool = AtomicBool::new(false);
 pub static DONE_INIT: AtomicBool = AtomicBool::new(false);
