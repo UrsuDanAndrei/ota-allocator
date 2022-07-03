@@ -8,7 +8,7 @@ void read_buf_from_socket(char *buf, int size) {
 }
 
 void admin_only_func() {
-	printf("admin_only_func called!!!\n");
+	printf("SUCCESSFUL EXPLOIT: unauthorized admin_only_func call\n");
 }
 
 void trigger(int *p1, char *p2) {
@@ -18,6 +18,8 @@ void trigger(int *p1, char *p2) {
 
 	if (*p1 == ADMIN) {
 		admin_only_func();
+	} else {
+		printf("FAILED EXPLOIT: normal execution flow\n");
 	}
 
 	// ...
