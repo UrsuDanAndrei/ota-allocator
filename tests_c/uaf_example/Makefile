@@ -1,3 +1,5 @@
+# uaf.c Makefile
+
 OTA_LIB_DIR=/home/dan/workspace/licenta/ota-allocator/tests_c/../target/release
 OTA_LIB_PATH=$(OTA_LIB_DIR)/libota_allocator.so
 

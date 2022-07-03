@@ -1,9 +1,11 @@
+// uaf.c source code file
+
 #include <stdlib.h>
 #include <stdio.h>
 
 typedef enum { NONE, STANDARD, ADMIN } Privilege;
 
-void read_buf_from_socket(char *buf, int size) {
+void read_buf(char *buf, int size) {
 	scanf("%d", buf);
 }
 
@@ -14,7 +16,7 @@ void admin_only_func() {
 void trigger(int *p1, char *p2) {
 	// ...
 
-	read_buf_from_socket(p2, 4);
+	read_buf(p2, 4);
 
 	if (*p1 == ADMIN) {
 		admin_only_func();
